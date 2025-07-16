@@ -1,83 +1,22 @@
 "use client"
-
-import { useState, useRef } from "react"
-import { ChevronLeft, ChevronRight, Plus, ChevronDown } from "lucide-react"
+import { Plus, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 import Calendar from "react-calendar"
+import { Button } from "@/components/ui/button"
+import "react-calendar/dist/Calendar.css"
+import Image from "next/image"
+import { useRef, useState } from "react"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import timeGridPlugin from "@fullcalendar/timegrid"
 import listPlugin from "@fullcalendar/list"
 import interactionPlugin from "@fullcalendar/interaction"
-import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import "react-calendar/dist/Calendar.css"
 
 export default function CalendarApp() {
-    const [selectedDate, setSelectedDate] = useState(new Date(2025, 6, 15)) // July 15, 2025
+    const calendarRef = useRef(null)
+    const [selectedDate, setSelectedDate] = useState(new Date(2025, 6, 17)) // July 15, 2025
     const [currentView, setCurrentView] = useState("Month")
 
-    const calendarRef = useRef(null)
-
-    // Map view names to FullCalendar view types
-    const viewMap = {
-        Day: "timeGridDay",
-        Week: "timeGridWeek",
-        Month: "dayGridMonth",
-        List: "listWeek",
-    }
-
-    const handleDateClick = (arg) => {
-        alert(`Date clicked: ${arg.dateStr}`)
-    }
-
-    const handleMiniCalendarChange = (value) => {
-        setSelectedDate(value)
-        // Navigate main calendar to the selected date
-        if (calendarRef.current) {
-            const calendarApi = calendarRef.current.getApi()
-            calendarApi.gotoDate(value)
-        }
-    }
-
-    const handleMainCalendarDatesSet = (dateInfo) => {
-        // Update mini calendar when main calendar view changes
-        const newDate = new Date(dateInfo.start)
-        // Adjust to show the middle of the visible range for better UX
-        const middleDate = new Date(dateInfo.start.getTime() + (dateInfo.end.getTime() - dateInfo.start.getTime()) / 2)
-        setSelectedDate(middleDate)
-    }
-
-    const handleViewChange = (viewName) => {
-        setCurrentView(viewName)
-
-        if (calendarRef.current) {
-            const calendarApi = calendarRef.current.getApi()
-            const fullCalendarView = viewMap[viewName]
-            calendarApi.changeView(fullCalendarView)
-        }
-    }
-
-    function renderEventContent(eventInfo) {
-        return (
-            <div
-                style={{
-                    backgroundColor: eventInfo.event.extendedProps.bgColor || "#E0F7FA",
-                    color: eventInfo.event.extendedProps.textColor || "#006064",
-                    padding: "2px 4px",
-                    borderRadius: "4px",
-                    fontSize: "0.85rem",
-                    width: "100%",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                }}
-            >
-                <i>{eventInfo.event.title}</i>
-            </div>
-        )
-    }
-
-    // Dummy events for July 2025 with colors
     const dummyEvents = [
         {
             title: "Team Standup",
@@ -172,8 +111,47 @@ export default function CalendarApp() {
         },
     ]
 
-    const formatMonthYear = (date) => {
-        return date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    function renderEventContent(eventInfo) {
+        return (
+            <div
+                style={{
+                    backgroundColor: eventInfo.event.extendedProps.bgColor || "#E0F7FA",
+                    color: eventInfo.event.extendedProps.textColor || "#006064",
+                    padding: "2px 4px",
+                    borderRadius: "4px",
+                    fontSize: "0.85rem",
+                    width: "100%",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                }}
+            >
+                <i>{eventInfo.event.title}</i>
+            </div>
+        )
+    }
+
+    const handleDateClick = (arg) => {
+        alert(`Date clicked: ${arg.dateStr}`)
+    }
+
+    const handleMainCalendarDatesSet = (dateInfo) => {
+        // Update selected date when main calendar view changes
+        const newDate = new Date(dateInfo.start)
+        // Adjust to show the middle of the visible range for better UX
+        const middleDate = new Date(dateInfo.start.getTime() + (dateInfo.end.getTime() - dateInfo.start.getTime()) / 2)
+        setSelectedDate(middleDate)
+    }
+
+    // Handle date selection from react-calendar
+    const handleMiniCalendarChange = (date) => {
+        setSelectedDate(date)
+
+        // Navigate main calendar to selected date
+        if (calendarRef.current) {
+            const calendarApi = calendarRef.current.getApi()
+            calendarApi.gotoDate(date)
+        }
     }
 
     const goToToday = () => {
@@ -187,145 +165,148 @@ export default function CalendarApp() {
         }
     }
 
+    // Navigation functions for header buttons
     const navigateMonth = (direction) => {
-        const newDate = new Date(selectedDate)
-        if (direction === "prev") {
-            newDate.setMonth(newDate.getMonth() - 1)
-        } else {
-            newDate.setMonth(newDate.getMonth() + 1)
-        }
-        setSelectedDate(newDate)
-
-        // Navigate main calendar as well
         if (calendarRef.current) {
             const calendarApi = calendarRef.current.getApi()
-            calendarApi.gotoDate(newDate)
+            if (direction === "prev") {
+                calendarApi.prev()
+            } else {
+                calendarApi.next()
+            }
         }
     }
 
+    // Handle view changes
+    const handleViewChange = (view) => {
+        setCurrentView(view)
+        if (calendarRef.current) {
+            const calendarApi = calendarRef.current.getApi()
+            let fullCalendarView = "dayGridMonth"
+
+            switch (view) {
+                case "Day":
+                    fullCalendarView = "timeGridDay"
+                    break
+                case "Week":
+                    fullCalendarView = "timeGridWeek"
+                    break
+                case "Month":
+                    fullCalendarView = "dayGridMonth"
+                    break
+                case "List":
+                    fullCalendarView = "listWeek"
+                    break
+            }
+
+            calendarApi.changeView(fullCalendarView)
+        }
+    }
+
+    const formatMonthYear = (date) => {
+        return date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    }
+
     return (
-        <div className="h-screen flex flex-col bg-white">
-            {/* Header */}
-            <header className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <div className="flex">
+            <div className="flex items-start  bg-blue-50 justify-start p-[10px] w-[20%] h-[100vh] flex-shrink-0 flex-col gap-[1.5rem]">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                            <div className="w-6 h-6 bg-white rounded-sm flex items-center justify-center">
-                                <span className="text-blue-500 text-xs font-bold">15</span>
-                            </div>
-                        </div>
-                        <h1 className="text-2xl font-normal text-gray-700">Calendar</h1>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <Button
-                            variant="outline"
-                            onClick={goToToday}
-                            className="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-50 bg-transparent"
-                        >
-                            Today
-                        </Button>
-
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => navigateMonth("prev")}
-                                className="w-8 h-8 rounded-full hover:bg-gray-100"
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => navigateMonth("next")}
-                                className="w-8 h-8 rounded-full hover:bg-gray-100"
-                            >
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
-                        </div>
-
-                        <h2 className="text-xl font-normal text-gray-700 min-w-[140px]">{formatMonthYear(selectedDate)}</h2>
+                    <div className="flex items-center gap-1">
+                        <Image overrideSrc="https://ssl.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_15_2x.png" alt="logo" width={40} height={40} />
+                        <h1 className="text-2xl font-normal">Calendar</h1>
                     </div>
                 </div>
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="outline"
-                            className="px-4 py-2 rounded-full border border-gray-300 hover:bg-gray-50 flex items-center gap-2 bg-transparent"
-                        >
-                            {currentView}
-                            <ChevronDown className="w-4 h-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleViewChange("Day")}>Day</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleViewChange("Week")}>Week</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleViewChange("Month")}>Month</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleViewChange("List")}>List</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </header>
-
-            <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar */}
-                <aside className="w-64 border-r border-gray-200 p-4 flex flex-col gap-4">
-                    <Button className="w-full justify-start gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full py-3">
-                        <Plus className="w-4 h-4" />
-                        Create
+                <Button
+                    className="flex mr-[10%] font-semibold items-center gap-2 bg-white hover:bg-gray-50 rounded-[15px] border border-gray-300 shadow-sm h-[54px] px-4 py-3 text-gray-700">
+                    <Plus className="w-5 h-5" />
+                    <span className="text-sm">Create</span>
+                    <ChevronDown className="w-4 h-4" />
+                </Button>
+                <div className="h-auto p-1">
+                    <Calendar
+                        onChange={handleMiniCalendarChange}
+                        value={selectedDate}
+                        locale="en-US"
+                        className="custom-calendar"
+                        formatShortWeekday={(locale, date) =>
+                            date.toLocaleDateString(locale, { weekday: "narrow" })
+                        }
+                    />
+                </div>
+            </div>
+            <main className="h-[100%] w-[100%] flex flex-col ">
+                <div className="flex items-center bg-blue-50 gap-4 w-full justify-between  p-[8px]">
+                    <Button
+                        variant="outline"
+                        onClick={goToToday}
+                        className="px-4 py-2 rounded-full font-medium border border-black hover:bg-gray-50 bg-transparent"
+                    >
+                        Today
                     </Button>
 
-                    <div className="mini-calendar">
-                        <Calendar
-                            onChange={handleMiniCalendarChange}
-                            value={selectedDate}
-                            className="w-full border-none"
-                            tileClassName={({ date, view }) => {
-                                if (view === "month") {
-                                    const isSelected = date.toDateString() === selectedDate.toDateString()
-                                    const isToday = date.toDateString() === new Date().toDateString()
-
-                                    if (isSelected) {
-                                        return "bg-blue-600 text-white rounded-full"
-                                    }
-                                    if (isToday) {
-                                        return "bg-blue-100 text-blue-600 rounded-full"
-                                    }
-                                }
-                                return ""
-                            }}
-                        />
+                    <div className="flex items-center justify-between gap-3 md:gap-[1.5rem]">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigateMonth("prev")}
+                            className="w-8 h-8 rounded-full bg-gray-100"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </Button>
+                        <h2 className="text-base font-semibold font-sans text-black-700 ">{formatMonthYear(selectedDate)}</h2>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigateMonth("next")}
+                            className="w-8 h-8 rounded-full bg-gray-100"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </Button>
                     </div>
-                </aside>
 
-                {/* Main Calendar */}
-                <main className="flex-1 p-6">
-                    <div className="h-full">
-                        <FullCalendar
-                            ref={calendarRef}
-                            plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            initialDate={selectedDate}
-                            weekends={true}
-                            events={dummyEvents}
-                            eventContent={renderEventContent}
-                            dateClick={handleDateClick}
-                            datesSet={handleMainCalendarDatesSet}
-                            headerToolbar={false}
-                            height="100%"
-                            dayHeaderClassNames="text-sm font-medium text-gray-600 py-3"
-                            dayCellClassNames="border-r border-b border-gray-100 hover:bg-gray-50"
-                            eventClassNames="cursor-pointer"
-                            slotMinTime="06:00:00"
-                            slotMaxTime="22:00:00"
-                            allDaySlot={true}
-                            nowIndicator={true}
-                            scrollTime="08:00:00"
-                        />
-                    </div>
-                </main>
-            </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className="px-4 py-2  rounded-full border border-black hover:bg-gray-50 flex items-center gap-2 bg-transparent "
+                            >
+                                {currentView}
+                                <ChevronDown className="w-4 h-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleViewChange("Day")}>Day</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewChange("Week")}>Week</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewChange("Month")}>Month</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewChange("List")}>List</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+                <div className="h-[calc(100vh-70px)] ">
+                    <FullCalendar
+                        ref={calendarRef}
+                        plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                        initialView="dayGridMonth"
+                        initialDate={selectedDate}
+                        weekends={true}
+                        // events={dummyEvents}
+                        eventContent={renderEventContent}
+                        dateClick={handleDateClick}
+                        datesSet={handleMainCalendarDatesSet}
+                        headerToolbar={false}
+                        height="100%"
+                        dayHeaderClassNames="text-sm font-medium text-gray-600 py-3"
+                        dayCellClassNames="border-r border-b border-gray-100 hover:bg-gray-50"
+                        eventClassNames="cursor-pointer"
+                        slotMinTime="06:00:00"
+                        slotMaxTime="22:00:00"
+                        allDaySlot={true}
+                        nowIndicator={true}
+                        scrollTime="08:00:00"
+                    />
+                </div>
+            </main>
         </div>
+
     )
 }
