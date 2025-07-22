@@ -34,7 +34,7 @@ const CalendarSideBar = () => {
             </div>
 
             <Collapsible defaultOpen={true} className="w-full">
-                <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-sm font-semibold ">
+                <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-4 bg-none hover:bg-gray-300 rounded-full text-sm font-semibold ">
                     <span className=''>My calendars</span>
                     <ChevronUp className="h-4 w-4 font-bold data-[state=closed]:rotate-180 transition-transform" />
                 </CollapsibleTrigger>
@@ -70,7 +70,7 @@ const CalendarSideBar = () => {
             </Collapsible>
 
             <Collapsible defaultOpen={true} className="w-full">
-                <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-4 bg-gray-200 hover:bg-gray-300 rounded-full text-sm font-semibold ">
+                <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-4 bg-none hover:bg-gray-300 rounded-full text-sm font-semibold ">
                     <div className="flex items-center gap-2 w-full">
                         <span>Other calendars</span>
                      <Plus className="h-5.5 w-5.5 font-bold ml-[22%] hover:bg-white p-[2px] rounded-[20%]"  />

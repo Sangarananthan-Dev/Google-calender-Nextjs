@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-
+import { cookies } from "next/headers";
 const oauth2Client = new google.auth.OAuth2({
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -23,6 +23,13 @@ export function getTokensFromRequest(req, body = null) {
 
   if (body?.tokens) {
     return body.tokens;
+  }
+
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("google_access_token")?.value;
+
+  if (accessToken) {
+    return { access_token: accessToken };
   }
 
   return null;
