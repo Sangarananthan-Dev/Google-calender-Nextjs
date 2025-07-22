@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 const CalendarHeader = ({ selectedDate, currentView, onGoToToday, onNavigateMonth, onViewChange }) => {
     return (
-        <div className="flex items-center bg-blue-50 gap-4 w-full justify-between p-[8px]">
+        <div className="flex items-center bg-[#f8fafd] gap-4 w-full justify-between p-[8px]">
             <Button
                 variant="outline"
                 onClick={onGoToToday}
