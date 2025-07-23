@@ -35,22 +35,18 @@ export default function CalendarApp() {
             const transformedEvents = data.items.map((event) => ({
                 id: event.id,
                 title: event.summary,
-                // Use 'date' for all-day events, 'dateTime' for timed events.
-                // FullCalendar can handle both formats.
                 start: event.start.date || event.start.dateTime,
                 end: event.end.date || event.end.dateTime,
                 url: event.htmlLink,
-                color : event.colorId ? `${event.colorId}` : undefined, // Use colorId if available
-                // You can add more properties here if needed, e.g., color, description, allDay
+                color: event.colorId ? `${event.colorId}` : undefined,
             }))
 
             successCallback(transformedEvents)
         } catch (error) {
             console.error("Error fetching events:", error)
-            // Pass the error to FullCalendar's failure callback
             failureCallback(error)
         }
-    }, []) // useCallback with an empty dependency array ensures this function is stable.
+    }, [])
 
     const goToToday = () => {
         const today = new Date()
@@ -90,7 +86,7 @@ export default function CalendarApp() {
                     fullCalendarView = "dayGridMonth"
                     break
                 case "List":
-                    fullCalendarView = "listWeek" // Displays a list of events for the current week
+                    fullCalendarView = "listWeek" 
                     break
             }
             calendarApi.changeView(fullCalendarView)
@@ -98,24 +94,21 @@ export default function CalendarApp() {
     }
 
     const handleDateClick = (arg) => {
-        // When a date is clicked, open the CreateEvent drawer for that date
         const dateRange = {
             start: arg.dateStr,
-            end: arg.dateStr, // For a single day click, start and end are the same
+            end: arg.dateStr, 
         }
         setSelectedRange(dateRange)
         setIsDrawerOpen(true)
     }
 
     const handleSelect = (arg) => {
-        // When a date range is selected (dragged), open the CreateEvent drawer for the range
         const dateRange = {
             start: arg.startStr,
             end: arg.endStr,
         }
         setSelectedRange(dateRange)
         setIsDrawerOpen(true)
-        // Unselect the date range after opening the drawer
         if (calendarRef.current) {
             const calendarApi = calendarRef.current.getApi()
             calendarApi.unselect()
@@ -123,13 +116,11 @@ export default function CalendarApp() {
     }
 
     const handleEventClick = (clickInfo) => {
-        // Handle event click, e.g., open event details modal or redirect to Google Calendar
         if (clickInfo.event.url) {
             window.open(clickInfo.event.url, "_blank")
-            clickInfo.jsEvent.preventDefault() // Prevent default FullCalendar navigation
+            clickInfo.jsEvent.preventDefault() 
         }
-        // You could also implement a custom modal here to show event details
-        // For example: setSelectedEvent(clickInfo.event.extendedProps); setIsEventDetailsModalOpen(true);
+      
     }
 
     return (
@@ -153,20 +144,20 @@ export default function CalendarApp() {
                             weekends={true}
                             selectable={true}
                             selectMirror={true}
-                            select={handleSelect} // Callback for date range selection
-                            dateClick={handleDateClick} // Callback for single date click
-                            eventClick={handleEventClick} // Callback for event click
-                            headerToolbar={false} // Hide FullCalendar's default header
-                            height="100%" // Make calendar fill the container height
+                            select={handleSelect} 
+                            dateClick={handleDateClick} 
+                            eventClick={handleEventClick} 
+                            headerToolbar={false} 
+                            height="100%" 
                             dayHeaderClassNames="text-sm font-medium text-gray-600 py-3"
                             dayCellClassNames="border-r border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
                             eventClassNames="cursor-pointer"
-                            scrollTime="08:00:00" // Start scroll at 8 AM for timeGrid views
+                            scrollTime="08:00:00" 
                             selectConstraint={{
                                 start: "1900-01-01",
                                 end: "2100-12-31",
                             }}
-                            events={fetchEvents} 
+                            events={fetchEvents}
                         />
                     </div>
 
