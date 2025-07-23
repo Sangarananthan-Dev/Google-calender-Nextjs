@@ -252,19 +252,48 @@ const CreateEvent = ({
   }
 
   const handleFormSubmit = async (values) => {
-    // Format the data according to the expected structure
+    // Format the data
     const formattedData = {
       ...values,
+      action: "create-full-featured-event",
+      calendarId: "primary",
+   
       startDateTime: formatDateTime(values.startDate, values.startTime, values.allDay, values.timeZone),
       endDateTime: formatDateTime(values.endDate, values.endTime, values.allDay, values.timeZone),
-    }
+    };
 
-    // Remove helper fields before submission
-    const { startDate, endDate, startTime, endTime, allDay, newGuestEmail, ...submitData } = formattedData
-    console.log("Submitting data:", submitData)
-    await onSubmit(submitData)
-    onOpenChange(false)
-  }
+    // Remove helper fields
+    const { startDate, endDate, startTime, endTime, newGuestEmail, ...submitData } = formattedData;
+
+    console.log("Submitting data:", submitData);
+
+    try {
+      const res = await fetch("/api/calendar/event/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(submitData),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("API Error:", errorData);
+        // Optionally show toast/alert to user
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Event created:", data);
+      // Optionally show success toast / redirect user
+
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Request failed:", error);
+      // Optionally show error toast
+    }
+  };
+
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0">
@@ -608,7 +637,7 @@ const CreateEvent = ({
                                   </div>
                                 ) : (
                                   <div
-                                      className="flex items-center space-x-2 p-2 cursor-pointer rounded-2xl"
+                                    className="flex items-center space-x-2 p-2 cursor-pointer rounded-2xl"
                                     onClick={() => formik.setFieldValue("meetingType", true)}
                                   >
                                     <div className="w-6 h-6 flex items-center justify-center">
@@ -646,7 +675,7 @@ const CreateEvent = ({
                                         ></path>
                                       </svg>
                                     </div>
-                                      <span className="text-gray-600 hover:text-blue-700 text-sm font-medium ">Add Google Meet video conferencing</span>
+                                    <span className="text-gray-600 hover:text-blue-700 text-sm font-medium ">Add Google Meet video conferencing</span>
                                   </div>
                                 )}
                               </div>
@@ -810,7 +839,7 @@ const CreateEvent = ({
                             )}
                           </FieldArray>
 
-                         
+
 
                           {/* Calendar/Color */}
                           <div className="flex items-center space-x-2">

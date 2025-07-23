@@ -293,7 +293,7 @@ async function createMeetingEvent(calendar, body) {
         },
       },
     },
-  };
+  };``
 
   // Add reminders if specified
   if (reminders) {
@@ -387,11 +387,13 @@ async function createFullFeaturedEvent(calendar, body) {
     summary,
     startDateTime,
     endDateTime,
-
+    startDate,
+    endDate,
     // Basic event details
     description,
     location,
     timeZone = "UTC",
+    allDay = false,
 
     // Attendees
     attendees = [],
@@ -401,16 +403,13 @@ async function createFullFeaturedEvent(calendar, body) {
     sendUpdates = "all", // "all", "externalOnly", "none"
     sendNotifications, // Deprecated, use sendUpdates
 
-    // Conference/Meeting
-    conferenceData,
-    conferenceDataVersion = 0,
+    //Meeting
+    meetingType,
 
     // Attachments
     attachments = [],
-    supportsAttachments = false,
 
     // Event properties
-    id, // Custom event ID
     colorId,
     visibility = "default", // "default", "public", "private", "confidential"
     transparency = "opaque", // "opaque", "transparent"
@@ -422,7 +421,9 @@ async function createFullFeaturedEvent(calendar, body) {
 
     // Recurrence
     recurrence,
-
+    id,
+    conferenceDataVersion,
+    supportsAttachments,
     // Guest settings
     guestsCanInviteOthers = true,
     guestsCanModify = false,
@@ -484,12 +485,10 @@ async function createFullFeaturedEvent(calendar, body) {
   };
 
   // Set custom ID if provided
-  if (id) {
-    event.id = id;
-  }
+  event.id = id;
 
   // Handle start/end times
-  if (startDateTime && endDateTime) {
+  if (!allDay) {
     // Regular timed event
     event.start = {
       dateTime: startDateTime,
@@ -499,13 +498,13 @@ async function createFullFeaturedEvent(calendar, body) {
       dateTime: endDateTime,
       timeZone,
     };
-  } else if (startDate && endDate) {
+  } else if (allDay) {
     // All-day event
     event.start = {
-      date: startDate,
+      date: startDateTime,
     };
     event.end = {
-      date: endDate,
+      date: endDateTime,
     };
   }
 
@@ -515,15 +514,7 @@ async function createFullFeaturedEvent(calendar, body) {
       if (typeof attendee === "string") {
         return { email: attendee };
       }
-      return {
-        email: attendee.email,
-        displayName: attendee.displayName,
-        optional: attendee.optional || false,
-        resource: attendee.resource || false,
-        responseStatus: attendee.responseStatus || "needsAction",
-        comment: attendee.comment,
-        additionalGuests: attendee.additionalGuests || 0,
-      };
+      return attendee;
     });
   }
 
@@ -535,10 +526,10 @@ async function createFullFeaturedEvent(calendar, body) {
 
   // Add reminders
   if (reminders) {
-    event.reminders = {
-      useDefault: reminders.useDefault || false,
-      overrides: reminders.overrides || [],
-    };
+    event.reminders =
+      reminders.length === 0
+        ? { useDefault: true }
+        : { useDefault: false, overrides: reminders };
   }
 
   // Add recurrence
@@ -547,8 +538,14 @@ async function createFullFeaturedEvent(calendar, body) {
   }
 
   // Add conference data (Google Meet, etc.)
-  if (conferenceData) {
-    event.conferenceData = conferenceData;
+  if (meetingType) {
+    event.conferenceData = {
+      createRequest: {
+        requestId: `meet-${Date.now()}`,
+        conferenceSolutionKey: { type: "hangoutsMeet" },
+      },
+    };
+    event.conferenceDataVersion = 1; // Required for the API to create Meet links
   }
 
   // Add attachments
@@ -560,36 +557,6 @@ async function createFullFeaturedEvent(calendar, body) {
       iconLink: attachment.iconLink,
       fileId: attachment.fileId,
     }));
-  }
-
-  // Add extended properties
-  if (extendedProperties) {
-    event.extendedProperties = {
-      private: extendedProperties.private || {},
-      shared: extendedProperties.shared || {},
-    };
-  }
-
-  // Add source
-  if (source) {
-    event.source = {
-      url: source.url,
-      title: source.title,
-    };
-  }
-
-  // Add gadget
-  if (gadget) {
-    event.gadget = {
-      type: gadget.type,
-      title: gadget.title,
-      link: gadget.link,
-      iconLink: gadget.iconLink,
-      width: gadget.width,
-      height: gadget.height,
-      display: gadget.display || "icon",
-      preferences: gadget.preferences || {},
-    };
   }
 
   // Add special event type properties
@@ -614,12 +581,8 @@ async function createFullFeaturedEvent(calendar, body) {
     calendarId,
     requestBody: event,
     sendUpdates,
+    conferenceDataVersion: event.conferenceDataVersion || 1,
   };
-
-  // Add optional parameters
-  if (conferenceDataVersion > 0) {
-    requestParams.conferenceDataVersion = conferenceDataVersion;
-  }
 
   if (maxAttendees) {
     requestParams.maxAttendees = maxAttendees;
@@ -635,6 +598,7 @@ async function createFullFeaturedEvent(calendar, body) {
   }
 
   try {
+    console.log("Creating event with parameters:", requestParams);
     const response = await calendar.events.insert(requestParams);
     return NextResponse.json(response.data);
   } catch (error) {
