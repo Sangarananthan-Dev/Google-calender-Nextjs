@@ -136,6 +136,7 @@ const CreateEvent = ({
   initialData,
   onSubmit,
 }) => {
+  console.log("selectedRange:", selectedRange , "selectedDate:", selectedDate, "initialData:", initialData)
   const [activeTab, setActiveTab] = useState("event-details")
   const [showStartDatePicker, setShowStartDatePicker] = useState(false)
   const [showEndDatePicker, setShowEndDatePicker] = useState(false)
