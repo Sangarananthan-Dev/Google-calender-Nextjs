@@ -21,7 +21,6 @@ export default function CalendarApp() {
     const [selectedRange, setSelectedRange] = useState(null)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-    // Event popover state
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [eventTriggerRect, setEventTriggerRect] = useState(null)
     const [isEventPopoverOpen, setIsEventPopoverOpen] = useState(false)
@@ -43,12 +42,16 @@ export default function CalendarApp() {
                     const color = event.colorId ? calendarColors[event.colorId] : "#039be5"
                     return {
                         ...event,
+                        eventView: {
+                            ...event.eventView,
+                            backgroundColor: color ? color.background : undefined,
+                        },
                         backgroundColor: color ? color.background : undefined,
                         eventBorderColor: "white",
                     }
+                    
                 })
 
-                console.log("Fetched events: ", ColoredEvents)
                 successCallback(ColoredEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
@@ -104,7 +107,6 @@ export default function CalendarApp() {
     }
 
     const handleDateClick = (arg) => {
-        // Close event popover if open
         setIsEventPopoverOpen(false)
 
         const dateRange = {
@@ -116,7 +118,6 @@ export default function CalendarApp() {
     }
 
     const handleSelect = (arg) => {
-        // Close event popover if open
         setIsEventPopoverOpen(false)
 
         const dateRange = {
@@ -132,19 +133,15 @@ export default function CalendarApp() {
     }
 
     const handleEventClick = (clickInfo) => {
-        // Prevent the event from bubbling up
         clickInfo.jsEvent.preventDefault()
         clickInfo.jsEvent.stopPropagation()
 
-        // Get the clicked element's position
         const rect = clickInfo.el.getBoundingClientRect()
 
-        // Set the event data and trigger position
-        setSelectedEvent(clickInfo.event.extendedProps)
+        setSelectedEvent(clickInfo.event.extendedProps.eventView)
         setEventTriggerRect(rect)
         setIsEventPopoverOpen(true)
 
-        // Close create event drawer if open
         setIsDrawerOpen(false)
     }
 

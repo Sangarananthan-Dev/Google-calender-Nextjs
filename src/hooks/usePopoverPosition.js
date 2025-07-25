@@ -14,9 +14,8 @@ export function usePopoverPosition({ isOpen, triggerRect, popoverWidth, popoverH
         height: window.innerHeight,
       }
 
-      const spacing = 8 // Gap between trigger and popover
+      const spacing = 8 
 
-      // Try different placements in order of preference
       const placements = [
         {
           name: "bottom",
@@ -40,7 +39,6 @@ export function usePopoverPosition({ isOpen, triggerRect, popoverWidth, popoverH
         },
       ]
 
-      // Find the best placement that fits in viewport
       for (const placement of placements) {
         const fitsHorizontally = placement.x >= 0 && placement.x + popoverWidth <= viewport.width
         const fitsVertically = placement.y >= 0 && placement.y + popoverHeight <= viewport.height
@@ -54,11 +52,9 @@ export function usePopoverPosition({ isOpen, triggerRect, popoverWidth, popoverH
         }
       }
 
-      // Fallback: position with constraints
       let finalX = rect.left + rect.width / 2 - popoverWidth / 2
       let finalY = rect.bottom + spacing
 
-      // Constrain to viewport
       finalX = Math.max(8, Math.min(finalX, viewport.width - popoverWidth - 8))
       finalY = Math.max(8, Math.min(finalY, viewport.height - popoverHeight - 8))
 
@@ -71,7 +67,6 @@ export function usePopoverPosition({ isOpen, triggerRect, popoverWidth, popoverH
     [popoverWidth, popoverHeight],
   )
 
-  // Calculate position immediately when triggerRect is available
   const initialPosition = useMemo(() => {
     if (triggerRect && popoverWidth > 0 && popoverHeight > 0) {
       return calculatePosition(triggerRect)

@@ -599,7 +599,6 @@ async function createFullFeaturedEvent(calendar, body) {
   }
 
   try {
-    console.log("Creating event with parameters:", requestParams);
     const response = await calendar.events.insert(requestParams);
     return NextResponse.json(response.data);
   } catch (error) {

@@ -136,7 +136,6 @@ const CreateEvent = ({
   initialData,
   onSubmit,
 }) => {
-  console.log("selectedRange:", selectedRange , "selectedDate:", selectedDate, "initialData:", initialData)
   const [activeTab, setActiveTab] = useState("event-details")
   const [showStartDatePicker, setShowStartDatePicker] = useState(false)
   const [showEndDatePicker, setShowEndDatePicker] = useState(false)
@@ -266,7 +265,6 @@ const CreateEvent = ({
     // Remove helper fields
     const { startDate, endDate, startTime, endTime, newGuestEmail, ...submitData } = formattedData;
 
-    console.log("Submitting data:", submitData);
 
     try {
       const res = await fetch("/api/calendar/event/", {
@@ -285,7 +283,6 @@ const CreateEvent = ({
       }
 
       const data = await res.json();
-      console.log("Event created:", data);
       // Optionally show success toast / redirect user
 
       onOpenChange(false);

@@ -2,15 +2,14 @@
 
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { X, Edit, Trash2, ExternalLink, MapPin, Clock, User, Phone, FileText } from "lucide-react"
+import { X, Trash2,Copy,  MapPin,  Edit2, LucideUser2, XIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePopoverPosition } from "@/hooks/usePopoverPosition"
 
 
 export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
-    console.log     
 
-            
+
     const popoverRef = useRef(null)
     const [popoverDimensions, setPopoverDimensions] = useState({ width: 400, height: 300 })
     const [isMounted, setIsMounted] = useState(false)
@@ -22,10 +21,8 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
         popoverHeight: popoverDimensions.height,
     })
 
-    // Measure popover dimensions on first render
     useEffect(() => {
         if (isOpen && popoverRef.current && !isMounted) {
-            // Force a layout to get accurate measurements
             const rect = popoverRef.current.getBoundingClientRect()
             setPopoverDimensions({
                 width: Math.max(rect.width, 400),
@@ -35,7 +32,6 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
         }
     }, [isOpen, isMounted])
 
-    // Reset mounted state when popover closes
     useEffect(() => {
         if (!isOpen) {
             setIsMounted(false)
@@ -48,7 +44,7 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
         }
 
         const handleClickOutside = (e) => {
-            if (popoverRef.current && !popoverRef.current.contains(e.target )) {
+            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
                 onClose()
             }
         }
@@ -85,12 +81,85 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
         })
     }
 
+
+    const GoogleMeetButton = (event) => {
+
+        if (!event.hangoutLink) return null
+        const GoogleMeetIcon = () => (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 48 48"
+                className="flex-shrink-0"
+            >
+                <rect
+                    width="16"
+                    height="16"
+                    x="12"
+                    y="16"
+                    fill="#fff"
+                    transform="rotate(-90 20 24)"
+                />
+                <polygon fill="#1e88e5" points="3,17 3,31 8,32 13,31 13,17 8,16" />
+                <path
+                    fill="#4caf50"
+                    d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
+                />
+                <path
+                    fill="#fbc02d"
+                    d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
+                />
+                <path fill="#1565c0" d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z" />
+                <polygon fill="#e53935" points="13,7 13,17 3,17" />
+                <polygon fill="#2e7d32" points="38,24 37,32.45 27,24 37,15.55" />
+                <path
+                    fill="#4caf50"
+                    d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
+                />
+            </svg>
+        );
+
+        const handleCopyLink = () => {
+            navigator.clipboard.writeText(event.hangoutLink);
+        };
+
+        return (
+            <div className="max-w-md mx-auto p-1 bg-gray-100">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                        <GoogleMeetIcon />
+                        <div className="flex flex-col gap-1">
+                            <button
+                                className="flex-1  text-[12px] px-5 py-2 min-w-[50%] rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
+                                onClick={() => window.open(event.hangoutLink, "_blank")}
+                            >
+                                Join with Google Meet
+                            </button>
+                           
+                        </div>
+                      
+                        <button
+                            className="p-2 hover:bg-gray-200  ml-auto rounded-full transition-colors"
+                            onClick={handleCopyLink}
+                            title="Copy link"
+                        >
+                            <Copy className="w-5 h-5 text-gray-600" />
+                        </button>
+                    </div>
+                    <div className="text-[11px] text-gray-600 pl-[12%] break-all">
+                        {event.hangoutLink}
+                    </div>
+                </div>
+            </div>
+        );
+    };
     const isAllDay = !event.start?.includes("T")
 
     const popoverContent = (
         <div
             ref={popoverRef}
-            className="fixed z-50 w-96 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden transition-opacity duration-150"
+            className="fixed z-50 w-96 bg-[#f0f4f9] rounded-[20px] shadow-xl p-0 overflow-hidden transition-opacity duration-150"
             style={{
                 left: position.x,
                 top: position.y,
@@ -99,150 +168,57 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
                 visibility: isReady ? "visible" : "hidden",
             }}
         >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between px-[1rem] pt-[.7rem] border-b border-gray-100">
                 <div className="flex items-center gap-3">
                     <div className="w-4 h-4 rounded" style={{ backgroundColor: event.backgroundColor || "#039be5" }} />
-                    <h2 className="font-medium text-gray-900 truncate">{event.title || "(No Title)"}</h2>
-                </div>
-                <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
-                        <X className="h-4 w-4" />
-                    </Button>
-                </div>
-            </div>
-
-            {/* Content - Scrollable */}
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(60vh - 80px)" }}>
-                <div className="p-4 space-y-4">
-                    {/* Date and Time */}
-                    <div className="flex items-start gap-3">
-                        <Clock className="h-5 w-5 text-gray-500 mt-0.5" />
+                    <div className="flex flex-col justify-center items-start">
+                        <h2 className="font-semibold text-gray-800 truncate">{event.title || "(No Title)"}</h2>
                         <div>
-                            <div className="text-sm text-gray-900">{formatDate(event.start)}</div>
+                            <div className="text-[12px] font-medium text-gray-900">{formatDate(event.start)}</div>
                             {!isAllDay && (
-                                <div className="text-sm text-gray-600">
+                                <div className="text-[11px] font-normal text-gray-600">
                                     {formatTime(event.start)} - {formatTime(event.end)}
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Google Meet Link */}
-                    {event.hangoutLink && (
-                        <div className="space-y-3">
-                            <Button
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                                onClick={() => window.open(event.hangoutLink, "_blank")}
-                            >
-                                <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                                </svg>
-                                Join with Google Meet
-                            </Button>
-                            <div className="text-sm text-gray-600 break-all">{event.hangoutLink}</div>
-                        </div>
-                    )}
-
-                    {/* Phone Join Option */}
-                    {event.hangoutLink && (
-                        <div className="flex items-start gap-3">
-                            <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
-                            <div>
-                                <div className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">Join by phone</div>
-                                <div className="text-sm text-gray-600">(US) +1 575-912-1431 PIN: 846 090 440#</div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Meeting Notes */}
-                    {event.hangoutLink && (
-                        <div className="flex items-start gap-3">
-                            <FileText className="h-5 w-5 text-gray-500 mt-0.5" />
-                            <div>
-                                <div className="text-sm font-medium text-blue-600 cursor-pointer hover:underline">
-                                    Take meeting notes
-                                </div>
-                                <div className="text-sm text-gray-600">Start a new document to capture notes</div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Location */}
-                    {event.location && (
-                        <div className="flex items-start gap-3">
-                            <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-                            <div className="text-sm text-gray-900">{event.location}</div>
-                        </div>
-                    )}
-
-                    {/* Description */}
-                    {event.description && (
-                        <div className="flex items-start gap-3">
-                            <FileText className="h-5 w-5 text-gray-500 mt-0.5" />
-                            <div className="text-sm text-gray-900 whitespace-pre-wrap">{event.description}</div>
-                        </div>
-                    )}
-
-                    {/* Creator */}
-                    {event.creator && (
-                        <div className="flex items-start gap-3">
-                            <User className="h-5 w-5 text-gray-500 mt-0.5" />
-                            <div className="text-sm text-gray-900">{event.creator.email}</div>
-                        </div>
-                    )}
-
-                    {/* External Link */}
-                    {event.url && (
-                        <div className="pt-2">
-                            <Button variant="outline" size="sm" onClick={() => window.open(event.url, "_blank")} className="w-full">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Open in Google Calendar
-                            </Button>
-                        </div>
-                    )}
+                </div>
+                <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
+                        <XIcon className="h-4 w-4" />
+                    </Button>
                 </div>
             </div>
 
-            {/* Arrow indicator - only show when ready */}
-            {isReady && (
-                <div
-                    className={`absolute w-3 h-3 bg-white border transform rotate-45 ${position.placement === "bottom"
-                            ? "-top-1.5 border-b-0 border-r-0"
-                            : position.placement === "top"
-                                ? "-bottom-1.5 border-t-0 border-l-0"
-                                : position.placement === "right"
-                                    ? "-left-1.5 border-r-0 border-b-0"
-                                    : "-right-1.5 border-l-0 border-t-0"
-                        }`}
-                    style={{
-                        left:
-                            position.placement === "bottom" || position.placement === "top"
-                                ? "50%"
-                                : position.placement === "right"
-                                    ? "-6px"
-                                    : "auto",
-                        right: position.placement === "left" ? "-6px" : "auto",
-                        top:
-                            position.placement === "left" || position.placement === "right"
-                                ? "50%"
-                                : position.placement === "bottom"
-                                    ? "-6px"
-                                    : "auto",
-                        bottom: position.placement === "top" ? "-6px" : "auto",
-                        transform:
-                            position.placement === "bottom" || position.placement === "top"
-                                ? "translateX(-50%) rotate(45deg)"
-                                : "translateY(-50%) rotate(45deg)",
-                    }}
-                />
-            )}
+            <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: "calc(60vh - 80px)" }}>
+                <div className="p-4 space-y-2">
+                    {GoogleMeetButton(event)}
+
+                    {event.location && (
+                        <div className="flex  p-1 items-start gap-3">
+                            <MapPin className="h-4 w-4 mr-1 text-gray-500 mt-0.5" />
+                            <div className="text-[13px] font-medium text-gray-900">{event.location}</div>
+                        </div>
+                    )}
+
+                    {event.creator && (
+                        <div className="flex  p-1 items-start gap-3">
+                            <LucideUser2 className="h-4 w-4 mr-1 text-gray-500 mt-0.5" />
+                            <div className="text-[13px] font-medium text-gray-900">{event.creator.email}</div>
+                        </div>
+                    )}
+                   
+                </div>
+            </div>
+
+          
         </div>
     )
 

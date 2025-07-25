@@ -466,7 +466,6 @@ async function deleteCalendar(calendar, calendarId) {
     });
   } catch (error) {
     // If can't delete calendar (not owned), that's okay - just removed from list
-    console.log("Calendar removed from list but not deleted (not owned)");
   }
 
   return NextResponse.json({ message: "Calendar deleted successfully" });
