@@ -1,4 +1,5 @@
 "use client"
+
 import { useRef, useState, useCallback } from "react"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
@@ -10,6 +11,8 @@ import CreateEvent from "./components/modal/CreateEvent"
 import CalendarHeader from "./components/CalendarHeader"
 import { useLazyListEventsQuery } from "@/redux/service/api/eventApiSlice"
 import { calendarColors } from "@/utils/CalendarColors"
+import EventPopover from "./components/modal/EventPopover"
+
 export default function CalendarApp() {
     const calendarRef = useRef(null)
     const today = new Date()
@@ -18,36 +21,42 @@ export default function CalendarApp() {
     const [selectedRange, setSelectedRange] = useState(null)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-    const [listEvents] = useLazyListEventsQuery();
+    // Event popover state
+    const [selectedEvent, setSelectedEvent] = useState(null)
+    const [eventTriggerRect, setEventTriggerRect] = useState(null)
+    const [isEventPopoverOpen, setIsEventPopoverOpen] = useState(false)
+
+    const [listEvents] = useLazyListEventsQuery()
 
     const fetchEvents = useCallback(
         async (fetchInfo, successCallback, failureCallback) => {
             try {
-                const timeMin = fetchInfo.start.toISOString();
-                const timeMax = fetchInfo.end.toISOString();
+                const timeMin = fetchInfo.start.toISOString()
+                const timeMax = fetchInfo.end.toISOString()
                 const result = await listEvents({
                     calendarId: "primary",
                     timeMin,
                     timeMax,
-                }).unwrap();
+                }).unwrap()
 
-                const ColoredEvents = result.map(event => {
-                    const color = event.colorId ? calendarColors[event.colorId] : "#039be5" ;
+                const ColoredEvents = result.map((event) => {
+                    const color = event.colorId ? calendarColors[event.colorId] : "#039be5"
                     return {
                         ...event,
                         backgroundColor: color ? color.background : undefined,
                         eventBorderColor: "white",
-                    };
-                });
+                    }
+                })
 
-                successCallback(ColoredEvents);
+                console.log("Fetched events: ", ColoredEvents)
+                successCallback(ColoredEvents)
             } catch (error) {
-                console.error("Error fetching events:", error);
-                failureCallback(error);
+                console.error("Error fetching events:", error)
+                failureCallback(error)
             }
         },
-        [listEvents]
-    );
+        [listEvents],
+    )
 
     const goToToday = () => {
         const today = new Date()
@@ -95,6 +104,9 @@ export default function CalendarApp() {
     }
 
     const handleDateClick = (arg) => {
+        // Close event popover if open
+        setIsEventPopoverOpen(false)
+
         const dateRange = {
             start: arg.dateStr,
             end: arg.dateStr,
@@ -104,6 +116,9 @@ export default function CalendarApp() {
     }
 
     const handleSelect = (arg) => {
+        // Close event popover if open
+        setIsEventPopoverOpen(false)
+
         const dateRange = {
             start: arg.startStr,
             end: arg.endStr,
@@ -117,10 +132,26 @@ export default function CalendarApp() {
     }
 
     const handleEventClick = (clickInfo) => {
-        if (clickInfo.event.url) {
-            window.open(clickInfo.event.url, "_blank")
-            clickInfo.jsEvent.preventDefault()
-        }
+        // Prevent the event from bubbling up
+        clickInfo.jsEvent.preventDefault()
+        clickInfo.jsEvent.stopPropagation()
+
+        // Get the clicked element's position
+        const rect = clickInfo.el.getBoundingClientRect()
+
+        // Set the event data and trigger position
+        setSelectedEvent(clickInfo.event.extendedProps)
+        setEventTriggerRect(rect)
+        setIsEventPopoverOpen(true)
+
+        // Close create event drawer if open
+        setIsDrawerOpen(false)
+    }
+
+    const handleCloseEventPopover = () => {
+        setIsEventPopoverOpen(false)
+        setSelectedEvent(null)
+        setEventTriggerRect(null)
     }
 
     return (
@@ -160,14 +191,21 @@ export default function CalendarApp() {
                             events={fetchEvents}
                         />
                     </div>
-
                 </div>
             </main>
+
             <CreateEvent
                 isOpen={isDrawerOpen}
                 onOpenChange={setIsDrawerOpen}
                 selectedRange={selectedRange}
                 selectedDate={selectedDate}
+            />
+
+            <EventPopover
+                isOpen={isEventPopoverOpen}
+                onClose={handleCloseEventPopover}
+                event={selectedEvent}
+                triggerRect={eventTriggerRect}
             />
         </div>
     )

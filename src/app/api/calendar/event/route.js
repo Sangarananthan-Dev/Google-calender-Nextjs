@@ -183,6 +183,7 @@ async function getEvent(calendar, calendarId, eventId) {
   const response = await calendar.events.get({
     calendarId,
     eventId,
+    fetch : "*"
   });
   return NextResponse.json(response.data);
 }

@@ -1,12 +1,10 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query";
-import Cookies from "js-cookie";
 
 export const customBaseQuery = async (args, api, extraOptions) => {
   const rawBaseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
     prepareHeaders: (headers) => {
-      const token ="hi";
-    
+      const token = process.env.NEXT_PUBLIC_GOOGLE_ACCESS_TOKEN;
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }

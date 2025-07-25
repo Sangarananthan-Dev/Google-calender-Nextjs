@@ -10,6 +10,7 @@ const eventApiSlice = apiService.injectEndpoints({
         params: { timeMin, timeMax },
       }),
       transformResponse: (response) => {
+        console.log("Transformed response ", response);
         return response.items.map((event) => ({
           id: event.id,
           title: event.summary ? event.summary : "(No Title)",
@@ -17,8 +18,13 @@ const eventApiSlice = apiService.injectEndpoints({
           end: event.end.date || event.end.dateTime,
           url: event.htmlLink,
           colorId: event.colorId ?? undefined,
+          hangoutLink: event.hangoutLink ?? undefined,
+          location: event.location ?? undefined,
+          creator : event.creator ?? undefined,
+          description: event.description ?? undefined,
         }));
       },
+      
       keepUnusedDataFor: 60,
       refetchOnMountOrArgChange: false,
       providesTags: ["Events"],

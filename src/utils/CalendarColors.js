@@ -16,7 +16,7 @@
      foreground: "#1d1d1d",
    },
    5: {
-     background: "#fbd75b",
+     background: "#f6bf26",
      foreground: "#1d1d1d",
    },
    6: {
@@ -28,7 +28,7 @@
      foreground: "#1d1d1d",
    },
    8: {
-     background: "#e1e1e1",
+     background: "#616161",
      foreground: "#1d1d1d",
    },
    9: {
