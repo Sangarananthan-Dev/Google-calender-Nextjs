@@ -133,6 +133,7 @@ const eventApiSlice = apiService.injectEndpoints({
           end,
           visibility: eventData.visibility,
           eventType: eventData.eventType,
+          colorId: eventData.colorId,
           reminders: {
             ...eventData.reminders,
             useDefault: eventData.reminders.overrides.length > 0 ? false : true,
