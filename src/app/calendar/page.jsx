@@ -7,7 +7,7 @@ import timeGridPlugin from "@fullcalendar/timegrid"
 import listPlugin from "@fullcalendar/list"
 import interactionPlugin from "@fullcalendar/interaction"
 import CalendarSideBar from "./components/CalendarSideBar"
-import CreateEvent from "./components/modal/CreateEvent"
+import CreateEventModal from "./components/modal/CreateEventModal"
 import CalendarHeader from "./components/CalendarHeader"
 import { useLazyListEventsQuery } from "@/redux/service/api/eventApiSlice"
 import { calendarColors } from "@/utils/CalendarColors"
@@ -20,7 +20,7 @@ export default function CalendarApp() {
     const [currentView, setCurrentView] = useState("Month")
     const [selectedRange, setSelectedRange] = useState(null)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-
+    const [isEditMode, setIsEditMode] = useState({ editable: false, eventId: null })
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [eventTriggerRect, setEventTriggerRect] = useState(null)
     const [isEventPopoverOpen, setIsEventPopoverOpen] = useState(false)
@@ -49,7 +49,7 @@ export default function CalendarApp() {
                         backgroundColor: color ? color.background : undefined,
                         eventBorderColor: "white",
                     }
-                    
+
                 })
 
                 successCallback(ColoredEvents)
@@ -191,11 +191,13 @@ export default function CalendarApp() {
                 </div>
             </main>
 
-            <CreateEvent
+            <CreateEventModal
                 isOpen={isDrawerOpen}
                 onOpenChange={setIsDrawerOpen}
                 selectedRange={selectedRange}
                 selectedDate={selectedDate}
+                isEditMode={isEditMode.editable}
+                eventId={isEditMode.eventId}
             />
 
             <EventPopover
@@ -203,6 +205,8 @@ export default function CalendarApp() {
                 onClose={handleCloseEventPopover}
                 event={selectedEvent}
                 triggerRect={eventTriggerRect}
+                setIsDrawerOpen={setIsDrawerOpen}
+                setIsEditMode={setIsEditMode}
             />
         </div>
     )

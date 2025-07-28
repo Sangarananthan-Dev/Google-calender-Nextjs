@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { X, Trash2,Copy,  MapPin,  Edit2, LucideUser2, XIcon } from "lucide-react"
+import { X, Trash2, Copy, MapPin, Edit2, LucideUser2, XIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePopoverPosition } from "@/hooks/usePopoverPosition"
+import { GoogleMeetIcon } from "../../../../../public/logos/GoogleMeetIcon"
 
 
-export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
+export default function EventPopover({ isOpen, onClose, event, triggerRect, setIsEditMode, setIsDrawerOpen }) {
 
 
     const popoverRef = useRef(null)
@@ -85,41 +86,6 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
     const GoogleMeetButton = (event) => {
 
         if (!event.hangoutLink) return null
-        const GoogleMeetIcon = () => (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 48 48"
-                className="flex-shrink-0"
-            >
-                <rect
-                    width="16"
-                    height="16"
-                    x="12"
-                    y="16"
-                    fill="#fff"
-                    transform="rotate(-90 20 24)"
-                />
-                <polygon fill="#1e88e5" points="3,17 3,31 8,32 13,31 13,17 8,16" />
-                <path
-                    fill="#4caf50"
-                    d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
-                />
-                <path
-                    fill="#fbc02d"
-                    d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
-                />
-                <path fill="#1565c0" d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z" />
-                <polygon fill="#e53935" points="13,7 13,17 3,17" />
-                <polygon fill="#2e7d32" points="38,24 37,32.45 27,24 37,15.55" />
-                <path
-                    fill="#4caf50"
-                    d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
-                />
-            </svg>
-        );
-
         const handleCopyLink = () => {
             navigator.clipboard.writeText(event.hangoutLink);
         };
@@ -136,9 +102,9 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
                             >
                                 Join with Google Meet
                             </button>
-                           
+
                         </div>
-                      
+
                         <button
                             className="p-2 hover:bg-gray-200  ml-auto rounded-full transition-colors"
                             onClick={handleCopyLink}
@@ -168,13 +134,20 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
                 visibility: isReady ? "visible" : "hidden",
             }}
         >
-            <div className="flex items-center justify-between px-[1rem] pt-[.7rem] border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded" style={{ backgroundColor: event.backgroundColor || "#039be5" }} />
+            <div className="flex items-start justify-between px-[1rem] pt-[.7rem] border-b border-gray-100">
+                <div className="flex items-center gap-3 w-[70%] flex-shrink-0 ">
+                    <div
+                        className="w-4 h-4 rounded aspect-square"
+                        style={{ backgroundColor: event.backgroundColor || "#039be5" }}
+                    />
                     <div className="flex flex-col justify-center items-start">
-                        <h2 className="font-semibold text-gray-800 truncate">{event.title || "(No Title)"}</h2>
+                        <h2 className="font-semibold text-[18px] text-gray-800 w-full break-words whitespace-normal">
+                            {event.title || "(No Title)"}
+                        </h2>
                         <div>
-                            <div className="text-[12px] font-medium text-gray-900">{formatDate(event.start)}</div>
+                            <div className="text-[12px] font-medium text-gray-900">
+                                {formatDate(event.start)}
+                            </div>
                             {!isAllDay && (
                                 <div className="text-[11px] font-normal text-gray-600">
                                     {formatTime(event.start)} - {formatTime(event.end)}
@@ -182,10 +155,13 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
                             )}
                         </div>
                     </div>
-
                 </div>
-                <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+
+                <div className="flex items-center gap-1 w-[30%]">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => {
+                        setIsEditMode({ editable: true, eventId: event.id }),
+                            setIsDrawerOpen(true)
+                    }}>
                         <Edit2 className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -198,7 +174,7 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
             </div>
 
             <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: "calc(60vh - 80px)" }}>
-                <div className="p-4 space-y-2">
+                <div className="px-4 py-4 space-y-2">
                     {GoogleMeetButton(event)}
 
                     {event.location && (
@@ -214,11 +190,11 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect }) {
                             <div className="text-[13px] font-medium text-gray-900">{event.creator.email}</div>
                         </div>
                     )}
-                   
+
                 </div>
             </div>
 
-          
+
         </div>
     )
 
