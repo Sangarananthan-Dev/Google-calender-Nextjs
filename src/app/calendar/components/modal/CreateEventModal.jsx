@@ -59,6 +59,7 @@ const CreateEventModal = ({
   eventId,
   onOpenChange,
   selectedRange,
+  setIsEditMode
 }) => {
   const { data: eventData } = useGetEventQuery(eventId, { skip: !isEditMode });
   console.log(eventData, "eventData");
@@ -180,7 +181,10 @@ const CreateEventModal = ({
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0">
+    <Drawer open={isOpen} onOpenChange={() => {
+      onOpenChange(false)
+      setIsEditMode({})
+    }} className="border-0">
       <DrawerContent className="h-[99%] bg-gray-50 p-0 m-0">
         <Formik
           initialValues={eventData || initialData}

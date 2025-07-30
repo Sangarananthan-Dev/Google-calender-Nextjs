@@ -198,6 +198,9 @@ export default function CalendarApp() {
                 selectedDate={selectedDate}
                 isEditMode={isEditMode.editable}
                 eventId={isEditMode.eventId}
+                key={isEditMode.eventId}
+                setIsEditMode={setIsEditMode}
+
             />
 
             <EventPopover
