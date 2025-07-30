@@ -89,72 +89,68 @@ const eventApiSlice = apiService.injectEndpoints({
           timeZone,
           allDay,
           isMeeting,
-          maxAttendees,
-          sendNotifications,
-          sendUpdates,
+          attendees,
+          reqParams,
+          reminders,
+          summary,
+          description,
+          location,
+          visibility,
+          eventType,
+          colorId,
+          guestsCanModify,
+          guestsCanInviteOthers,
+          guestsCanSeeOtherGuests,
         } = eventData;
 
-        const getConferenceData = () => {
-          const data = {
-            createRequest: {
-              requestId: `meet-${Date.now()}`,
-              conferenceSolutionKey: {
-                type: "hangoutsMeet",
-              },
-            },
+        const createDateTimeObject = (date, time, isAllDay) => {
+          if (isAllDay) {
+            return { date };
+          }
+          return {
+            dateTime: new Date(`${date}T${time}:00`).toISOString(),
+            timeZone,
           };
-          return isMeeting ? data : null;
         };
-        let start = {};
-        let end = {};
-        if (allDay) {
-          start = {
-            date: startDate,
-          };
-          end = {
-            date: endDate,
-          };
-        } else {
-          start = {
-            dateTime: new Date(`${startDate}T${startTime}:00`).toISOString(),
-            timeZone,
-          };
-          end = {
-            dateTime: new Date(`${endDate}T${endTime}:00`).toISOString(),
-            timeZone,
-          };
-        }
 
         const body = {
-          summary: eventData.summary,
-          description: eventData.description,
-          location: eventData.location,
-          start,
-          end,
-          visibility: eventData.visibility,
-          eventType: eventData.eventType,
-          colorId: eventData.colorId,
-          reminders: {
-            ...eventData.reminders,
-            useDefault: eventData.reminders.overrides.length > 0 ? false : true,
-          },
-          guestsCanModify: eventData.guestsCanModify,
-          guestsCanInviteOthers: eventData.guestsCanInviteOthers,
-          guestsCanSeeOtherGuests: eventData.guestsCanSeeOtherGuests,
+          summary,
+          description,
+          location,
+          start: createDateTimeObject(startDate, startTime, allDay),
+          end: createDateTimeObject(endDate, endTime, allDay),
+          visibility,
+          eventType,
+          colorId,
+          guestsCanModify,
+          guestsCanInviteOthers,
+          guestsCanSeeOtherGuests,
           sequence: 0,
-          attendees: eventData.attendees,
-          conferenceData: getConferenceData(),
+          attendees,
+          ...(isMeeting && {
+            conferenceData: {
+              createRequest: {
+                requestId: `meet-${Date.now()}`,
+                conferenceSolutionKey: { type: "hangoutsMeet" },
+              },
+            },
+          }),
+          reminders: {
+            ...reminders,
+            useDefault: !reminders?.overrides?.length,
+          },
         };
+
         const params = {
           conferenceDataVersion: isMeeting ? 1 : 0,
-          maxAttendees: maxAttendees,
-          sendNotifications: sendNotifications,
-          sendUpdates: sendUpdates,
-          supportsAttachments: false,
+          maxAttendees: reqParams.maxAttendees,
+          sendNotifications: reqParams.sendNotifications,
+          sendUpdates: reqParams.sendUpdates,
+          supportsAttachments: reqParams.supportsAttachments, // Fixed typo
         };
 
         return {
-          url: `${EVENT_URL}/${eventData.reqParams.calendarId}/events`,
+          url: `${EVENT_URL}/${reqParams.calendarId}/events`,
           method: "POST",
           params,
           body,

@@ -18,8 +18,9 @@ import {
   User2,
   BellRingIcon,
   Settings,
+  TimerIcon,
 } from "lucide-react"
-import {  timezoneOptions } from "@/utils/dateFormat"
+import { timezoneOptions } from "@/utils/dateFormat"
 import { useCreateEventMutation, useGetEventQuery, useUpdateEventMutation } from "@/redux/service/api/eventApiSlice"
 import { calendarColors } from "@/utils/CalendarColors"
 import moment from "moment-timezone";
@@ -59,7 +60,6 @@ const CreateEventModal = ({
   onOpenChange,
   selectedRange,
 }) => {
-  console.log(selectedRange)
   const { data: eventData } = useGetEventQuery(eventId, { skip: !isEditMode });
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -182,16 +182,16 @@ const CreateEventModal = ({
     <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0">
       <DrawerContent className="h-[99%] bg-gray-50 p-0 m-0">
         <Formik
-          initialValues={eventData || initialData}
+          initialValues={ eventData || initialData }
           validationSchema={validationSchema}
           onSubmit={handleFormSubmit}
           enableReinitialize
         >
           {(formik) => (
             <Form className="h-full flex flex-col ">
-
               <div className="w-[100%] h-full flex ">
-                <div className="w-[60%] h-full border-r flex flex-col">
+                {/* EVENT SECTION */}
+                <div className="w-[60%] h-[100%] border-r flex flex-col">
                   <DrawerHeader className="py-0 w-[100%] flex flex-row mt-2 ">
                     <h2 className="text-xl font-semibold mr-auto text-[#1e1e1e]">Event Details</h2>
                     <Button
@@ -202,106 +202,107 @@ const CreateEventModal = ({
                       {formik.isSubmitting ? "Saving..." : "Save"}
                     </Button>
                   </DrawerHeader>
-
-
-                  {/* EVENT SECTION */}
-                  <div className="p-4 flex flex-col gap-3 h-fit flex-shrink-0">
+                  <div className="p-4 flex flex-col gap-3 h-fit  flex-shrink-0">
                     <Field name="summary">
                       {({ field, meta }) => (
                         <div>
                           <Input
                             {...field}
                             placeholder="Title"
-                            className="my-custom-input text-2xl"
+                            className="my-custom-input text-2xl h-fit"
                           />
                         </div>
                       )}
                     </Field>
-                  </div>
-                  <div className="px-4 flex  gap-3 h-fit flex-shrink-0">
-                    <Field name="startDate">
-                      {({ field, meta }) => (
-                        <div>
-                          <Input
-                            type={"date"}
-                            {...field}
-                            placeholder="start date"
-                            className="custom-input text-2xl"
-                          />
-                        </div>
-                      )}
-                    </Field>
-                    {!formik.values.allDay ? (
-                      <Field name="startTime">
-                        {({ field, meta }) => (
-                          <div>
-                            <Input
-                              type={"time"}
-                              {...field}
-                              placeholder="start time"
-                              className="custom-input text-2xl"
-                            />
-                          </div>
-                        )}
-                      </Field>) : <></>
-                    }
 
-                    <Field name="endDate">
-                      {({ field, meta }) => (
-                        <div>
-                          <Input
-                            type={"date"}
-                            {...field}
-                            placeholder="end date"
-                            className="custom-input text-2xl"
-                          />
-                        </div>
-                      )}
-                    </Field>
-                    {!formik.values.allDay ? (
+                  </div>
+                  <div className="px-4 pb-4 overflow-y-scroll  flex flex-col  gap-3 h-[calc(100vh-27vh)] custom-scrollbar  flex-shrink-0">
+                    <div className="flex px-2 gap-3 items-start ">
+                      <TimerIcon className="w-5 h-5 text-gray-500 mt-3" />
+                      <div>
+                        <div className=" flex  gap-3 h-fit flex-shrink-0">
+                          <Field name="startDate">
+                            {({ field, meta }) => (
+                              <div>
+                                <Input
+                                  type={"date"}
+                                  {...field}
+                                  placeholder="start date"
+                                  className="custom-input text-2xl"
+                                />
+                              </div>
+                            )}
+                          </Field>
+                          {!formik.values.allDay ? (
+                            <Field name="startTime">
+                              {({ field, meta }) => (
+                                <div>
+                                  <Input
+                                    type={"time"}
+                                    {...field}
+                                    placeholder="start time"
+                                    className="custom-input text-2xl"
+                                  />
+                                </div>
+                              )}
+                            </Field>) : <></>
+                          }
 
-                      <Field name="endTime">
-                        {({ field, meta }) => (
-                          <div>
-                            <Input
-                              type={"time"}
-                              {...field}
-                              placeholder="end time"
-                              className="custom-input text-2xl"
-                            />
-                          </div>
-                        )}
-                      </Field>) : <></>
-                    }
-                  </div>
-                  <div className="p-4  flex  gap-3 h-fit flex-shrink-0">
-                    <Field name="allDay">
-                      {({ field, form }) => (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="checkbox"
-                            id="allDay"
-                            checked={field.value}
-                            onChange={() => form.setFieldValue("allDay", !field.value)}
-                            className="w-4 h-4"
-                          />
-                          <label htmlFor="allDay" className="text-sm">All day</label>
+                          <Field name="endDate">
+                            {({ field, meta }) => (
+                              <div>
+                                <Input
+                                  type={"date"}
+                                  {...field}
+                                  placeholder="end date"
+                                  className="custom-input text-2xl"
+                                />
+                              </div>
+                            )}
+                          </Field>
+                          {!formik.values.allDay ? (
+
+                            <Field name="endTime">
+                              {({ field, meta }) => (
+                                <div>
+                                  <Input
+                                    type={"time"}
+                                    {...field}
+                                    placeholder="end time"
+                                    className="custom-input text-2xl"
+                                  />
+                                </div>
+                              )}
+                            </Field>) : <></>
+                          }
                         </div>
-                      )}
-                    </Field>
-                    <Field name="timeZone" as="select" className="custom-scrollbar min-w-[300px] outline-none  text-sm custom-input">
-                      {timezoneOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Field>
-                  </div>
-                  <hr />
-                  <div className="p-4  flex flex-col  gap-3 h-fit flex-shrink-0">
+                        <div className="pt-4  flex  gap-3 h-fit flex-shrink-0">
+                          <Field name="allDay">
+                            {({ field, form }) => (
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="checkbox"
+                                  id="allDay"
+                                  checked={field.value}
+                                  onChange={() => form.setFieldValue("allDay", !field.value)}
+                                  className="w-4 h-4"
+                                />
+                                <label htmlFor="allDay" className="text-sm">All day</label>
+                              </div>
+                            )}
+                          </Field>
+                          <Field name="timeZone" as="select" className="custom-scrollbar min-w-[300px] outline-none  text-sm custom-input">
+                            {timezoneOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </Field>
+                        </div>
+                      </div>
+                    </div>
                     <div className="flex p-2 gap-3 items-center ">
                       <CalendarIcon className="w-5 h-5 text-gray-500" />
-
                       <Field name="colorId">
                         {({ field }) => (
                           <Popover
@@ -516,6 +517,17 @@ const CreateEventModal = ({
                       </div>
 
                     </div>
+                    <Field name="description">
+                      {({ field, meta }) => (
+                        <div>
+                          <textarea
+                            {...field}
+                            placeholder="Description"
+                            className="custom-input text-base min-h-[150px] outline-none w-full  overflow-y-auto"
+                          />
+                        </div>
+                      )}
+                    </Field>
                   </div>
                 </div>
                 {/* GUEST SECTION */}
