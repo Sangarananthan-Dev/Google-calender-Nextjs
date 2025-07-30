@@ -29,9 +29,6 @@ const eventApiSlice = apiService.injectEndpoints({
           },
         }));
       },
-
-      // keepUnusedDataFor: 60,
-      // refetchOnMountOrArgChange: false,
       providesTags: ["Events"],
     }),
     getEvent: builder.query({
@@ -40,44 +37,66 @@ const eventApiSlice = apiService.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (response) => {
+        const isAllDay = !!response.start.date;
+
+        const parseDateTime = (dateTimeStr) => {
+          const date = new Date(dateTimeStr);
+          return {
+            date: date.toISOString().split("T")[0],
+            time: date.toTimeString().split(":").slice(0, 2).join(":"),
+          };
+        };
+
+        let startDate = "";
+        let startTime = "";
+        let endDate = "";
+        let endTime = "";
+
+        if (isAllDay) {
+          startDate = response.start.date;
+          endDate = response.end.date;
+        } else {
+          const start = parseDateTime(response.start.dateTime);
+          const end = parseDateTime(response.end.dateTime);
+          startDate = start.date;
+          startTime = start.time;
+          endDate = end.date;
+          endTime = end.time;
+        }
+
         return {
           id: response.id,
           htmlLink: response.htmlLink,
-          summary: response.summary,
-          description: response.description,
-          location: response.location,
-          allDay: response.start.date
-            ? true
-            : false && response.end.date
-            ? true
-            : false,
-          start: {
-            date: response.start.date ? response.start.date : "",
-            dateTime: response.start.dateTime ? response.start.dateTime : "",
-            timeZone: response.start.timeZone ? response.start.timeZone : "",
+          summary: response.summary || "",
+          description: response.description || "",
+          location: response.location || "",
+          allDay: isAllDay,
+          startDate,
+          endDate,
+          startTime,
+          endTime,
+          timeZone: response.start.timeZone || "Asia/Kolkata", 
+          isMeeting: !!response.hangoutLink,
+          visibility: response.visibility || "default",
+          eventType: response.eventType || "default",
+          colorId: response.colorId || "1",
+          reminders: response.reminders || { useDefault: true, overrides: [] },
+          guestsCanModify: response.guestsCanModify ?? false,
+          guestsCanInviteOthers: response.guestsCanInviteOthers ?? false,
+          guestsCanSeeOtherGuests: response.guestsCanSeeOtherGuests ?? false,
+          sequence: response.sequence || 0,
+          attendees: response.attendees || [],
+          reqParams: {
+            calendarId: "primary", 
+            conferenceDataVersion: response.hangoutLink ? 1 : 0,
+            maxAttendees: 20,
+            sendNotifications: true,
+            sendUpdates: "all",
+            supportsAttachments: false,
           },
-          end: {
-            date: response.end.date ? response.end.date : "",
-            dateTime: response.end.dateTime ? response.end.dateTime : "",
-            timeZone: response.end.timeZone ? response.end.timeZone : "",
-          },
-          isMeeting: response.hangoutLink ? true : false,
-          visibility: response.visibility ? response.visibility : "default",
-          reminders: response.reminders,
-          eventType: response.eventType ? response.eventType : "default",
-          guestsCanModify: response.guestsCanModify
-            ? response.guestsCanModify
-            : false,
-          guestsCanInviteOthers: response.guestsCanInviteOthers
-            ? response.guestsCanInviteOthers
-            : false,
-          guestsCanSeeOtherGuests: response.guestsCanSeeOtherGuests
-            ? response.guestsCanSeeOtherGuests
-            : false,
-          sequence: response.sequence,
-          attendees: response.attendees,
         };
       },
+      
     }),
     createEvent: builder.mutation({
       query: ({ eventData }) => {

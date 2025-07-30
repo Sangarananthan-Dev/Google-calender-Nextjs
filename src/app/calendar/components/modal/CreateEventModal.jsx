@@ -59,8 +59,10 @@ const CreateEventModal = ({
   eventId,
   onOpenChange,
   selectedRange,
+  setIsEditMode
 }) => {
   const { data: eventData } = useGetEventQuery(eventId, { skip: !isEditMode });
+  console.log(eventData, "eventData");
   const [createEvent] = useCreateEventMutation();
   const [updateEvent] = useUpdateEventMutation();
   const [newGuestEmail, setNewGuestEmail] = useState("");
@@ -179,10 +181,13 @@ const CreateEventModal = ({
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0">
+    <Drawer open={isOpen} onOpenChange={() => {
+      onOpenChange(false)
+      setIsEditMode({})
+    }} className="border-0">
       <DrawerContent className="h-[99%] bg-gray-50 p-0 m-0">
         <Formik
-          initialValues={ eventData || initialData }
+          initialValues={eventData || initialData}
           validationSchema={validationSchema}
           onSubmit={handleFormSubmit}
           enableReinitialize
@@ -292,7 +297,7 @@ const CreateEventModal = ({
                             )}
                           </Field>
                           <Field name="timeZone" as="select" className="custom-scrollbar min-w-[300px] outline-none  text-sm custom-input">
-                            {timezoneOptions.map((option) => (
+                            {timezoneOptions?.map((option) => (
                               <option key={option.value} value={option.value}>
                                 {option.label}
                               </option>
@@ -328,7 +333,7 @@ const CreateEventModal = ({
                             </PopoverTrigger>
                             <PopoverContent className="w-48 p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
                               <div className="grid grid-cols-6 gap-1.5">
-                                {Object.entries(calendarColors).map(([id, color]) => (
+                                {Object.entries(calendarColors)?.map(([id, color]) => (
                                   <div
                                     key={id}
                                     className={cn(
@@ -411,7 +416,7 @@ const CreateEventModal = ({
                             <BellRingIcon className="w-5 h-5 text-gray-500" />
                           </div>
                           <div className="flex flex-col space-y-2 items-start">
-                            {formik.values.reminders.overrides.map((reminder, index) => (
+                            {formik.values.reminders.overrides?.map((reminder, index) => (
                               <div key={index} className="flex items-center gap-[10px]">
                                 <Select
                                   value={reminder.method}
@@ -423,7 +428,7 @@ const CreateEventModal = ({
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    {reminderMethods.map((method) => (
+                                    {reminderMethods?.map((method) => (
                                       <SelectItem key={method.value} value={method.value}>
                                         {method.label}
                                       </SelectItem>
@@ -480,7 +485,7 @@ const CreateEventModal = ({
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
                               <SelectContent>
-                                {eventTypeOptions.map((option) => (
+                                {eventTypeOptions?.map((option) => (
                                   <SelectItem
                                     key={option.value}
                                     value={option.value}
@@ -502,7 +507,7 @@ const CreateEventModal = ({
                                 <SelectValue placeholder="Select type" />
                               </SelectTrigger>
                               <SelectContent>
-                                {visibilityOptions.map((option) => (
+                                {visibilityOptions?.map((option) => (
                                   <SelectItem
                                     key={option.value}
                                     value={option.value}
@@ -561,7 +566,7 @@ const CreateEventModal = ({
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {sendUpdatesOptions.map((method) => (
+                              {sendUpdatesOptions?.map((method) => (
                                 <SelectItem key={method.value} value={method.value}>
                                   {method.label}
                                 </SelectItem>
@@ -701,7 +706,7 @@ const CreateEventModal = ({
                               <div className="space-y-4">
 
                                 <div className="space-y-2  p-1   h-[calc(100vh-25vh)] overflow-y-scroll">
-                                  {values.attendees.map((attendee, index) => {
+                                  {values.attendees?.map((attendee, index) => {
                                     const getStatusConfig = (status) => {
                                       switch (status) {
                                         case "needsAction":

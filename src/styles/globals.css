@@ -42,14 +42,10 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-
 html,
 body {
   font-family: var(--font-plus-jakarta-sans), sans-serif;
 }
-
-
-
 
 :root {
   --radius: 0.625rem;
@@ -130,7 +126,6 @@ body {
   }
 }
 
-
 .custom-scrollbar {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
@@ -141,78 +136,75 @@ body {
 }
 
 .my-custom-input {
-  font-weight: 500;                   
-  border-bottom-width: 1px;          
-  border-top-width: 0px;             
-  border-left-width: 0px;            
-  border-right-width: 0px;           
-  padding-left: 0px;                 
-  padding-right: 0px;                
-  margin: 0px;                       
-  border-radius: 0px;               
-  padding-top: 0rem;               
-  padding-bottom: 0.2rem;   
-  font-size : 1.2rem;          
-  box-shadow: none;                
-  height: auto;                    
+  font-weight: 500;
+  border-bottom-width: 1px;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin: 0px;
+  border-radius: 0px;
+  padding-top: 0rem;
+  padding-bottom: 0.2rem;
+  font-size: 1.2rem;
+  box-shadow: none;
+  height: auto;
 }
 .my-custom-input:focus {
-  font-weight: 500;                   
-  border-top-width: 0px;             
-  border-left-width: 0px;            
-  border-right-width: 0px;           
-  padding-left: 0px;                 
-  padding-right: 0px;                
-  margin: 0px;                       
-  border-radius: 0px;               
-  padding-top: 0rem;               
-  padding-bottom: 0.2rem;   
-  font-size : 1.2rem;          
-  box-shadow: none;                
-  height: auto; 
-  border-bottom: 2px solid #0b57d0; /* gray-200 */  
-
+  font-weight: 500;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+  margin: 0px;
+  border-radius: 0px;
+  padding-top: 0rem;
+  padding-bottom: 0.2rem;
+  font-size: 1.2rem;
+  box-shadow: none;
+  height: auto;
+  border-bottom: 2px solid #0b57d0; /* gray-200 */
 }
 .custom-input {
-  font-weight: 500;                  
-  margin: 0px;                       
-  border-radius: 3px;   
-  border: none;             
+  font-weight: 500;
+  margin: 0px;
+  border-radius: 3px;
+  border: none;
   padding: 0.7rem;
   padding-bottom: 0.6rem;
-  box-shadow: none;                   
-  height: auto;   
+  box-shadow: none;
+  height: auto;
   background: #e9eef6;
-  border-bottom: 3px solid #e4ebf900; /* gray-200 */  
-             
+  border-bottom: 3px solid #e4ebf900; /* gray-200 */
+  min-width: 125px;
 }
 .custom-input:focus {
-  font-weight: 500;                  
-  margin: 0px;                       
-  border-radius: 3px;   
-  border: none;             
+  font-weight: 500;
+  margin: 0px;
+  border-radius: 3px;
+  border: none;
   padding: 0.7rem;
   padding-bottom: 0.6rem;
 
-  box-shadow: none;                   
-  height: auto;   
+  box-shadow: none;
+  height: auto;
   background: #e9eef6;
-  border-bottom: 3px solid #0b57d0; /* gray-200 */  
+  border-bottom: 3px solid #0b57d0; /* gray-200 */
 }
 .custom-select {
-  font-weight: 500;                  
-  margin: 0px;                       
-  border-radius: 5px;   
-  border: none;             
+  font-weight: 500;
+  margin: 0px;
+  border-radius: 5px;
+  border: none;
   padding: 0.7rem;
-  box-shadow: none;                   
-  height: auto;   
-  background: #ffffff00;                 
+  box-shadow: none;
+  height: auto;
+  background: #ffffff00;
 }
 
 .my-custom-input:focus-visible {
-  outline: none;                      
-  box-shadow: none;                   
+  outline: none;
+  box-shadow: none;
 }
-
-
