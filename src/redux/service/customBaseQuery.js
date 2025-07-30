@@ -20,11 +20,11 @@ export const customBaseQuery = async (args, api, extraOptions) => {
 
   const result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/api/auth";
-    }
-  }
+  // if (result.error && result.error.status === 401) {
+  //   if (typeof window !== "undefined") {
+  //     window.location.href = "/api/auth";
+  //   }
+  // }
 
   return result;
 };
