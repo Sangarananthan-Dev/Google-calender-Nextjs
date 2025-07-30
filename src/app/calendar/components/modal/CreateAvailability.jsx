@@ -16,7 +16,10 @@ import {
     Plus,
     Clock,
     Calendar,
+    Trash,
+    Calendar1Icon,
 } from "lucide-react"
+import "@/styles/slotAvailability.css";
 
 const SlotAvailability = ({
     isOpen,
@@ -239,8 +242,8 @@ const SlotAvailability = ({
     };
 
     return (
-        <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0">
-            <DrawerContent className="h-[99%] bg-gray-50 p-0 m-0">
+        <Drawer open={isOpen} onOpenChange={onOpenChange} className="border-0 ">
+            <DrawerContent className="h-[99%]  p-0 m-0 bg-[#f0f4f9]">
                 <Formik
                     initialValues={initialData}
                     validationSchema={validationSchema}
@@ -255,7 +258,7 @@ const SlotAvailability = ({
                                 <div className="w-[100%] h-full flex ">
                                     <div className="w-[100%] h-[100%] flex">
                                         {/* Left Panel - Form */}
-                                        <div className="w-[44%] bg-[#f0f4f9] h-full border-r flex flex-col">
+                                        <div className="w-fit  h-full  flex flex-col">
                                             {/* <DrawerHeader className="py-0 w-[100%] flex flex-row mt-2">
                                                 <h2 className="text-xl font-semibold mr-auto text-[#1e1e1e]">
                                                     Slot Availability Schedule
@@ -296,10 +299,18 @@ const SlotAvailability = ({
                                                                     Add a Date
                                                                 </Button>
                                                             </div>
-                                                            <div className="flex flex-col gap-3   h-[calc(100vh-20vh)] w-[100%] custom-scrollbar overflow-y-scroll">
+
+
+                                                            {formik.values.availability.length === 0 ? (
+                                                                <div className="text-center py-8 flex flex-col gap-1 text-gray-500">
+                                                                    <Calendar1Icon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                                                                    <p className="text-sm font-medium mb-1">No availability added yet</p>
+                                                                    <p className="text-xs">Click "Add Availability" to get started</p>
+                                                                </div>
+                                                            ) : <div className="flex flex-col gap-3   h-[calc(100vh-20vh)] w-[100%] custom-scrollbar overflow-y-scroll">
                                                                 {formik.values.availability.map((dayAvailability, dayIndex) => (
                                                                     <div key={dayIndex} className="">
-                                                                        <div className="flex bg-[#f8fafd] p-2 rounded-md  items-start justify-between ">
+                                                                        <div className="flex bg-[#f8fafd] p-2 rounded-md  items-start gap-[2rem] ">
                                                                             <div className="flex flex-col items-center space-x-2">
                                                                                 <div className="flex items-center space-x-2">
                                                                                     <Field name={`availability.${dayIndex}.date`}>
@@ -326,36 +337,36 @@ const SlotAvailability = ({
                                                                             </div>
                                                                             <FieldArray name={`availability.${dayIndex}.slots`}>
                                                                                 {({ push: pushSlot, remove: removeSlot }) => (
-                                                                                    <div className="space-y-2   ">
-                                                                                        <div className="flex items-center justify-between ">
+                                                                                    <div className="space-y-2 flex-grow ">
+                                                                                        <div className="flex min-w-[100%]  gap-2 items-center justify-between ">
                                                                                             <span className="text-sm font-semibold text-muted-foreground">
                                                                                                 Time Slots
                                                                                             </span>
 
-                                                                                            <div className="flex items-center gap-2">
+                                                                                            <div className="flex items-center justify-between gap-4 rounded-md   ">
                                                                                                 <Button
                                                                                                     type="button"
                                                                                                     onClick={() => pushSlot({ start: "", end: "" })}
                                                                                                     variant="outline"
                                                                                                     size="sm"
+                                                                                                    className="text-sm border-none font-medium hover:bg-gray-100 transition"
                                                                                                 >
-                                                                                                    Add Slot
+                                                                                                     Add Slot
                                                                                                 </Button>
-
                                                                                                 {formik.values.availability[dayIndex].slots.length === 0 && (
                                                                                                     <Button
                                                                                                         type="button"
                                                                                                         onClick={() => remove(dayIndex)}
-                                                                                                        variant="ghost"
+                                                                                                        variant="outline"
                                                                                                         size="icon"
+                                                                                                        className="bg-red-500 text-white scale-90 hover:bg-red-600  aspect-square rounded-md transition w-fit"
+                                                                                                        aria-label="Remove Day"
                                                                                                     >
-                                                                                                        Remove
+                                                                                                        <Trash className="h-2 w-2" />
                                                                                                     </Button>
                                                                                                 )}
                                                                                             </div>
                                                                                         </div>
-
-
                                                                                         {dayAvailability.slots.map((slot, slotIndex) => (
                                                                                             <div key={slotIndex} className="flex items-center space-x-2   rounded">
                                                                                                 <Field name={`availability.${dayIndex}.slots.${slotIndex}.start`}>
@@ -421,16 +432,7 @@ const SlotAvailability = ({
 
                                                                     </div>
                                                                 ))}
-
-                                                            </div>
-
-                                                            {formik.values.availability.length === 0 && (
-                                                                <div className="text-center py-8 text-gray-500">
-                                                                    <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                                                                    <p>No availability added yet</p>
-                                                                    <p className="text-sm">Click "Add Availability" to get started</p>
-                                                                </div>
-                                                            )}
+                                                            </div>}
                                                         </div>
                                                     )}
                                                 </FieldArray>
@@ -438,7 +440,7 @@ const SlotAvailability = ({
                                         </div>
 
                                         {/* Right Panel - Calendar */}
-                                        <div className="w-[55%] h-[100%] bg-green-600 flex flex-col">
+                                        <div className="flex-grow h-[100%] flex flex-col enhanced-calendar-container ">
                                             <FullCalendar
                                                 ref={calendarRef}
                                                 plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
@@ -447,24 +449,24 @@ const SlotAvailability = ({
                                                 selectable={false}
                                                 selectMirror={false}
                                                 headerToolbar={{
-                                                    left: 'prev,next today',
-                                                    center: 'title',
-                                                    right: ''
+                                                    right: 'prev,next today',
+                                                    left: 'title',
+                                                    center: ''
                                                 }}
                                                 height="100%"
-                                                dayHeaderClassNames="text-sm font-medium text-gray-600 py-3"
-                                                dayCellClassNames="border-r border-b border-gray-100"
-                                                eventClassNames="cursor-pointer rounded"
+                                                dayHeaderClassNames="custom-day-header"
+                                                dayCellClassNames="custom-day-cell"
+                                                eventClassNames="custom-event"
                                                 scrollTime="08:00:00"
                                                 slotMinTime="00:00:00"
                                                 slotMaxTime="24:00:00"
                                                 allDaySlot={false}
-                                                slotDuration="00:30:00"
+                                                slotDuration="01:00:00"
                                                 slotLabelInterval="01:00:00"
                                                 slotLabelFormat={{
                                                     hour: 'numeric',
                                                     minute: '2-digit',
-                                                    omitZeroMinute: false,
+                                                    omitZeroMinute: true,
                                                     meridiem: 'short'
                                                 }}
                                                 events={calendarEvents}
@@ -475,6 +477,8 @@ const SlotAvailability = ({
                                                     minute: '2-digit',
                                                     meridiem: 'short'
                                                 }}
+                                                nowIndicator={true}
+                                                slotEventOverlap={false}
                                             />
                                         </div>
                                     </div>

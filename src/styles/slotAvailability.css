@@ -1,0 +1,239 @@
+/* Enhanced Calendar Container - Scoped Styles */
+.enhanced-calendar-container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+    sans-serif;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.fc-header-toolbar.fc-toolbar.fc-toolbar-ltr {
+    margin-bottom: 0 !important;
+}
+
+
+/* Header Toolbar Styling */
+.enhanced-calendar-container .fc-header-toolbar {
+  padding: 5px 10px !important;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.enhanced-calendar-container .fc-toolbar-title {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin: 0 !important;
+}
+
+.enhanced-calendar-container .fc-button-group .fc-button {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #000000 !important;
+  padding: 5px 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+}
+
+.enhanced-calendar-container .fc-button-group .fc-button:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.enhanced-calendar-container .fc-button-group .fc-button:disabled {
+  opacity: 0.5 !important;
+}
+
+/* Today Button */
+.enhanced-calendar-container .fc-today-button {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+  border-radius: 20px !important;
+  padding: 4px 16px !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+}
+
+/* Day Headers */
+.enhanced-calendar-container .fc-col-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.enhanced-calendar-container .fc-col-header-cell {
+  padding: 6px 2px !important;
+  border-right: 1px solid #f1f5f9 !important;
+}
+
+.enhanced-calendar-container .fc-col-header-cell-cushion {
+  color: #64748b !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
+}
+
+/* Time Grid Styling */
+.enhanced-calendar-container .fc-timegrid {
+  background: #ffffff;
+}
+
+.enhanced-calendar-container .fc-timegrid-slot {
+  border-bottom: 1px solid #f8fafc !important;
+  height: 45px !important;
+}
+
+.enhanced-calendar-container .fc-timegrid-slot:nth-child(even) {
+  background: #fafbfc;
+}
+
+/* Time Labels - This is the key part for your desired styling */
+.enhanced-calendar-container .fc-timegrid-slot-label {
+  border-right: 1px solid #f1f5f9 !important;
+  padding: 2px 16px !important;
+  width: 80px !important;
+  text-align: left !important;
+  vertical-align: top !important;
+}
+
+.enhanced-calendar-container .fc-timegrid-slot-label-cushion {
+  color: #64748b !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Style for major hour labels (1 AM, 2 AM, etc.) */
+.enhanced-calendar-container
+  .fc-timegrid-slot[data-time*=":00"]
+  .fc-timegrid-slot-label-cushion {
+  color: #374151 !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+}
+
+/* Time Grid Columns */
+.enhanced-calendar-container .fc-timegrid-col {
+  border-right: 1px solid #f1f5f9 !important;
+}
+
+.enhanced-calendar-container .fc-timegrid-col:last-child {
+  border-right: none !important;
+}
+
+/* Events Styling */
+.enhanced-calendar-container .fc-event {
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
+  margin: 1px 3px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.enhanced-calendar-container .fc-event-title {
+  font-weight: 500 !important;
+  font-size: 12px !important;
+}
+
+.enhanced-calendar-container .fc-event-time {
+  font-weight: 400 !important;
+  font-size: 11px !important;
+  opacity: 0.8;
+}
+
+/* Scrollbars */
+.enhanced-calendar-container .fc-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.enhanced-calendar-container .fc-scroller::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.enhanced-calendar-container .fc-scroller::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 3px;
+}
+
+.enhanced-calendar-container .fc-scroller::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.enhanced-calendar-container .fc-scroller::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Now Indicator */
+.enhanced-calendar-container .fc-timegrid-now-indicator-line {
+  border-top: 2px solid #ef4444 !important;
+  opacity: 0.8;
+}
+
+.enhanced-calendar-container .fc-timegrid-now-indicator-arrow {
+  border-top-color: #ef4444 !important;
+  border-bottom-color: #ef4444 !important;
+}
+
+/* Today Column Highlight */
+.enhanced-calendar-container .fc-day-today {
+  background-color: #c7e3ff !important;
+}
+
+.enhanced-calendar-container .fc-day-today .fc-timegrid-col-frame {
+  background-color: rgba(59, 130, 246, 0.02) !important;
+}
+
+/* Remove default borders and add custom ones */
+.enhanced-calendar-container .fc-theme-standard td,
+.enhanced-calendar-container .fc-theme-standard th {
+  border: 1px solid #e9e9e9 !important;
+}
+
+/* Custom responsive adjustments */
+@media (max-width: 768px) {
+  .enhanced-calendar-container .fc-timegrid-slot-label {
+    width: 60px !important;
+    padding: 4px 8px !important;
+  }
+
+  .enhanced-calendar-container .fc-timegrid-slot-label-cushion {
+    font-size: 11px !important;
+  }
+
+  .enhanced-calendar-container .fc-toolbar-title {
+    font-size: 20px !important;
+  }
+
+  .enhanced-calendar-container .fc-header-toolbar {
+    padding: 16px 16px 12px 16px !important;
+  }
+}
+
+/* Fix for time slot labels to show properly */
+.enhanced-calendar-container .fc-timegrid-axis {
+  width: 80px !important;
+}
+
+/* Ensure proper spacing and alignment */
+.enhanced-calendar-container
+  .fc-timegrid-slot-minor
+  .fc-timegrid-slot-label-cushion {
+  opacity: 0.6;
+  font-size: 12px !important;
+}
+
+/* Style the GMT offset if shown */
+.enhanced-calendar-container .fc-timegrid-axis-cushion {
+  color: #64748b !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+}
