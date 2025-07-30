@@ -1,6 +1,5 @@
-import {  NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getCalendarInstance, getTokensFromRequest } from "../helper";
-
 
 export async function GET(req) {
   try {
@@ -56,7 +55,6 @@ export async function POST(req) {
 
     const calendar = getCalendarInstance(tokens);
     const { action } = body;
-
     switch (action) {
       case "create-event":
         return await createEvent(calendar, body);
@@ -66,6 +64,8 @@ export async function POST(req) {
         return await quickAddEvent(calendar, body);
       case "create-recurring-event":
         return await createRecurringEvent(calendar, body);
+      case "create-full-featured-event":
+        return await createFullFeaturedEvent(calendar, body);
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
@@ -95,7 +95,6 @@ export async function PATCH(req) {
 
     const calendar = getCalendarInstance(tokens);
     const { action } = body;
-
     switch (action) {
       case "update-event":
         return await updateEvent(calendar, body);
@@ -184,6 +183,7 @@ async function getEvent(calendar, calendarId, eventId) {
   const response = await calendar.events.get({
     calendarId,
     eventId,
+    fetch : "*"
   });
   return NextResponse.json(response.data);
 }
@@ -294,7 +294,7 @@ async function createMeetingEvent(calendar, body) {
         },
       },
     },
-  };
+  };``
 
   // Add reminders if specified
   if (reminders) {
@@ -378,6 +378,239 @@ async function createRecurringEvent(calendar, body) {
   });
 
   return NextResponse.json(response.data);
+}
+
+// ENHANCED: Create a fully-featured event with all Google Calendar API v3 options
+async function createFullFeaturedEvent(calendar, body) {
+  const {
+    // Required parameters
+    calendarId = "primary",
+    summary,
+    startDateTime,
+    endDateTime,
+    startDate,
+    endDate,
+    // Basic event details
+    description,
+    location,
+    timeZone = "UTC",
+    allDay = false,
+
+    // Attendees
+    attendees = [],
+    maxAttendees,
+
+    // Notifications
+    sendUpdates = "all", // "all", "externalOnly", "none"
+    sendNotifications, // Deprecated, use sendUpdates
+
+    //Meeting
+    meetingType,
+
+    // Attachments
+    attachments = [],
+
+    // Event properties
+    colorId,
+    visibility = "default", // "default", "public", "private", "confidential"
+    transparency = "opaque", // "opaque", "transparent"
+    status = "confirmed", // "confirmed", "tentative", "cancelled"
+    eventType = "default", // "default", "birthday", "focusTime", "fromGmail", "outOfOffice", "workingLocation"
+
+    // Reminders
+    reminders,
+
+    // Recurrence
+    recurrence,
+    id,
+    conferenceDataVersion,
+    supportsAttachments,
+    // Guest settings
+    guestsCanInviteOthers = true,
+    guestsCanModify = false,
+    guestsCanSeeOtherGuests = true,
+    anyoneCanAddSelf = false,
+
+    // Extended properties
+    extendedProperties,
+
+    // Source
+    source,
+
+    // Gadget
+    gadget,
+
+    // Special event type properties
+    birthdayProperties,
+    focusTimeProperties,
+    outOfOfficeProperties,
+    workingLocationProperties,
+
+    // Sequence for conflict resolution
+    sequence = 0,
+  } = body;
+
+  // Validate required parameters
+  if (!summary) {
+    return NextResponse.json(
+      { error: "Event summary is required" },
+      { status: 400 }
+    );
+  }
+
+  if (!startDateTime && !startDate) {
+    return NextResponse.json(
+      { error: "Event start time is required (startDateTime or startDate)" },
+      { status: 400 }
+    );
+  }
+
+  if (!endDateTime && !endDate) {
+    return NextResponse.json(
+      { error: "Event end time is required (endDateTime or endDate)" },
+      { status: 400 }
+    );
+  }
+
+  // Build the event object
+  const event = {
+    summary,
+    description,
+    location,
+    colorId,
+    visibility,
+    transparency,
+    status,
+    eventType,
+    sequence,
+  };
+
+  // Set custom ID if provided
+  event.id = id;
+
+  // Handle start/end times
+  if (!allDay) {
+    // Regular timed event
+    event.start = {
+      dateTime: startDateTime,
+      timeZone,
+    };
+    event.end = {
+      dateTime: endDateTime,
+      timeZone,
+    };
+  } else if (allDay) {
+    // All-day event
+    event.start = {
+      date: startDateTime,
+    };
+    event.end = {
+      date: endDateTime,
+    };
+  }
+
+  // Process attendees with full options
+  if (attendees.length > 0) {
+    event.attendees = attendees.map((attendee) => {
+      if (typeof attendee === "string") {
+        return { email: attendee };
+      }
+      return attendee;
+    });
+  }
+
+  // Add guest permissions
+  event.guestsCanInviteOthers = guestsCanInviteOthers;
+  event.guestsCanModify = guestsCanModify;
+  event.guestsCanSeeOtherGuests = guestsCanSeeOtherGuests;
+  event.anyoneCanAddSelf = anyoneCanAddSelf;
+
+  // Add reminders
+  if (reminders) {
+    event.reminders =
+      reminders.length === 0
+        ? { useDefault: true }
+        : { useDefault: false, overrides: reminders };
+  }
+
+  // Add recurrence
+  if (recurrence) {
+    event.recurrence = recurrence;
+  }
+
+  // Add conference data (Google Meet, etc.)
+  if (meetingType) {
+    event.conferenceData = {
+      createRequest: {
+        requestId: `meet-${Date.now()}`,
+        conferenceSolutionKey: { type: "hangoutsMeet" },
+      },
+    };
+    event.conferenceDataVersion = 1; // Required for the API to create Meet links
+  }
+
+  // Add attachments
+  if (attachments.length > 0) {
+    event.attachments = attachments.map((attachment) => ({
+      fileUrl: attachment.fileUrl,
+      title: attachment.title,
+      mimeType: attachment.mimeType,
+      iconLink: attachment.iconLink,
+      fileId: attachment.fileId,
+    }));
+  }
+
+  // Add special event type properties
+  if (birthdayProperties && eventType === "birthday") {
+    event.birthdayProperties = birthdayProperties;
+  }
+
+  if (focusTimeProperties && eventType === "focusTime") {
+    event.focusTimeProperties = focusTimeProperties;
+  }
+
+  if (outOfOfficeProperties && eventType === "outOfOffice") {
+    event.outOfOfficeProperties = outOfOfficeProperties;
+  }
+
+  if (workingLocationProperties && eventType === "workingLocation") {
+    event.workingLocationProperties = workingLocationProperties;
+  }
+
+  // Build request parameters
+  const requestParams = {
+    calendarId,
+    requestBody: event,
+    sendUpdates,
+    conferenceDataVersion: event.conferenceDataVersion || 1,
+  };
+
+  if (maxAttendees) {
+    requestParams.maxAttendees = maxAttendees;
+  }
+
+  if (supportsAttachments) {
+    requestParams.supportsAttachments = supportsAttachments;
+  }
+
+  // Handle deprecated sendNotifications parameter
+  if (sendNotifications !== undefined) {
+    requestParams.sendNotifications = sendNotifications;
+  }
+
+  try {
+    const response = await calendar.events.insert(requestParams);
+    return NextResponse.json(response.data);
+  } catch (error) {
+    console.error("Event creation failed:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to create event",
+        details: error.message,
+      },
+      { status: 500 }
+    );
+  }
 }
 
 // Update an existing event

@@ -26,11 +26,6 @@ table.fc-scrollgrid.fc-scrollgrid-liquid {
   border: 0px solid #e4ebf9 !important; /* gray-200 */
 }
 
-/* Header table for days of the week */
-.fc-col-header {
-  /* Styles for the header table */
-}
-
 /* Individual day header cells (e.g., Sun, Mon) */
 .fc-col-header-cell {
   /* Styles for day header cells */
@@ -44,21 +39,6 @@ table.fc-scrollgrid.fc-scrollgrid-liquid {
   font-weight: 500;
   font-size: 12px;
   color: #202020;
-}
-
-/* Specific day header (e.g., Sunday) */
-.fc-day-sun .fc-col-header-cell-cushion {
-  /* Styles for Sunday header */
-}
-
-/* Body table for day grid */
-.fc-scrollgrid-sync-table {
-  /* Styles for the day grid table */
-}
-
-/* Individual day cells */
-.fc-daygrid-day {
-  /* Styles for each day cell */
 }
 
 /* Day number links */
@@ -78,60 +58,23 @@ table.fc-scrollgrid.fc-scrollgrid-liquid {
   border: 0px solid #e4ebf9 !important; /* gray-200 */
 }
 
-/* Day cell top section (contains day number) */
-.fc-daygrid-day-top {
-  /* Styles for the top section of day cells */
-}
-
-/* Day cell events container */
-.fc-daygrid-day-events {
-  /* Styles for the events container in day cells */
-}
-
-/* Individual event */
-.fc-daygrid-event {
-  /* Styles for events */
-}
-
-/* Event text container */
-.fc-daygrid-event > div {
-  /* Styles for event text */
-}
-
-/* Specific date cell (e.g., July 15, 2025) */
-.fc-day[data-date="2025-07-15"] {
-  /* Styles for a specific date */
-}
-
-/* Past days */
-.fc-day-past {
-  /* Styles for past days */
-}
-
 /* Today's date */
 .fc-day-today {
   /* Styles for today's date */
-  background: rgb(223, 239, 248) !important;
+  background: rgb(227, 244, 254) !important;
 }
 
-.fc-daygrid-day-bg {
-}
-/* Future days */
-.fc-day-future {
-  /* Styles for future days */
+
+
+.fc-event-title,
+.fc-event-time,
+.fc-event {
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    padding: 1px 3px !important;
+    border: none !important;
+    font-weight: 600 !important;
+    
 }
 
-/* Days outside the current month */
-.fc-day-other {
-  /* Styles for days in other months */
-}
 
-/* Hover effect for day cells */
-.fc-daygrid-day:hover {
-  /* Styles for hover effect on day cells */
-}
-
-/* Event for a specific day (e.g., Team Standup on July 2, 2025) */
-.fc-day[data-date="2025-07-02"] .fc-daygrid-event {
-  /* Styles for events on a specific day */
-}

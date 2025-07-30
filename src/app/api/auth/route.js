@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { cookies } from "next/headers";
 
 const authClient = new google.auth.OAuth2({
   clientId: process.env.GOOGLE_CLIENT_ID,
@@ -36,7 +37,12 @@ export async function GET(req) {
 export async function POST(req) {
   const { code } = await req.json();
   const tokens = await getAccessToken(code);
-
+  await cookies().set("google_access_token", tokens.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 8,
+    path: "/",
+  });
   const userInfo = await getGoogleUserInfo(tokens.access_token);
 
   return new Response(JSON.stringify({ tokens, userInfo }), { status: 200 });
