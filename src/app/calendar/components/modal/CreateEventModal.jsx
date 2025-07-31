@@ -67,12 +67,13 @@ const CreateEventModal = ({
   eventId,
   onOpenChange,
   selectedRange,
-  setIsEditMode
+  setIsEditMode,
+  onEventCreated
 }) => {
   const { data: eventData } = useGetEventQuery(eventId, { skip: !isEditMode });
   console.log(eventData, "eventData");
-  const [createEvent] = useCreateEventMutation();
-  const [updateEvent] = useUpdateEventMutation();
+  const [createEvent, { isSuccess: isEventCreated }] = useCreateEventMutation();
+  const [updateEvent, { isSuccess: isEventUpdated }] = useUpdateEventMutation();
   const [newGuestEmail, setNewGuestEmail] = useState("");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const formatDateTimeValues = (selectedRange) => {
@@ -173,9 +174,13 @@ const CreateEventModal = ({
     const eventData = values;
     try {
       if (!isEditMode) {
-        // await createEvent({ eventData }).unwrap();
+        await createEvent({ eventData }).unwrap();
+        onOpenChange(false)
+        onEventCreated?.()
       } else {
-        await updateEvent(values).unwrap();
+        await updateEvent({ eventData }).unwrap();
+        onOpenChange(false)
+        onEventCreated?.()
       }
     } catch (error) {
       console.log(error)
@@ -312,7 +317,7 @@ const CreateEventModal = ({
                               </option>
                             ))}
                           </Field>
-                          <Field
+                          {/* <Field
                             name="recurrence"
                             as="select"
                             className="custom-scrollbar min-w-[300px] outline-none text-sm custom-input"
@@ -322,7 +327,7 @@ const CreateEventModal = ({
                                 {option.label}
                               </option>
                             ))}
-                          </Field>
+                          </Field> */}
 
 
                         </div>
@@ -597,7 +602,7 @@ const CreateEventModal = ({
                           </Select>
                         )}
                       </Field>
-               
+
                     </div>
                     <div className="flex p-1 gap-3 h-fit flex-shrink-0">
                       {/* <Field name="guestsCanModify">

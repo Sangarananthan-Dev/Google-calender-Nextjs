@@ -6,11 +6,12 @@ import { X, Trash2, Copy, MapPin, Edit2, LucideUser2, XIcon } from "lucide-react
 import { Button } from "@/components/ui/button"
 import { usePopoverPosition } from "@/hooks/usePopoverPosition"
 import { GoogleMeetIcon } from "../../../../../public/logos/GoogleMeetIcon"
+import { useDeleteEventMutation } from "@/redux/service/api/eventApiSlice"
 
 
-export default function EventPopover({ isOpen, onClose, event, triggerRect, setIsEditMode, setIsDrawerOpen }) {
+export default function EventPopover({ isOpen, onClose, event, triggerRect, setIsEditMode, setIsDrawerOpen, onEventCreated }) {
 
-
+    const [deleteEvent] = useDeleteEventMutation();
     const popoverRef = useRef(null)
     const [popoverDimensions, setPopoverDimensions] = useState({ width: 400, height: 300 })
     const [isMounted, setIsMounted] = useState(false)
@@ -82,7 +83,16 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect, setI
         })
     }
 
-
+    const handleDelete = async (eventId) => {
+        try {
+            await deleteEvent(eventId).unwrap()
+            onEventCreated?.()
+            onClose()
+            setIsDrawerOpen(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const GoogleMeetButton = (event) => {
 
         if (!event.hangoutLink) return null
@@ -164,7 +174,7 @@ export default function EventPopover({ isOpen, onClose, event, triggerRect, setI
                     }}>
                         <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => handleDelete(event.id)}>
                         <Trash2 className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={onClose}>
