@@ -7,7 +7,7 @@ const eventApiSlice = apiService.injectEndpoints({
       query: ({ calendarId, timeMin, timeMax }) => ({
         url: `${EVENT_URL}/${calendarId}/events`,
         method: "GET",
-        params: { timeMin, timeMax },
+        params: { timeMin, timeMax, singleEvents: true },
       }),
       transformResponse: (response) => {
         return response.items.map((event) => ({
@@ -75,7 +75,7 @@ const eventApiSlice = apiService.injectEndpoints({
           endDate,
           startTime,
           endTime,
-          timeZone: response.start.timeZone || "Asia/Kolkata", 
+          timeZone: response.start.timeZone || "Asia/Kolkata",
           isMeeting: !!response.hangoutLink,
           visibility: response.visibility || "default",
           eventType: response.eventType || "default",
@@ -87,7 +87,7 @@ const eventApiSlice = apiService.injectEndpoints({
           sequence: response.sequence || 0,
           attendees: response.attendees || [],
           reqParams: {
-            calendarId: "primary", 
+            calendarId: "primary",
             conferenceDataVersion: response.hangoutLink ? 1 : 0,
             maxAttendees: 20,
             sendNotifications: true,
@@ -96,7 +96,7 @@ const eventApiSlice = apiService.injectEndpoints({
           },
         };
       },
-      
+      providesTags: ["Events"],
     }),
     createEvent: builder.mutation({
       query: ({ eventData }) => {
@@ -178,11 +178,93 @@ const eventApiSlice = apiService.injectEndpoints({
       invalidatesTags: ["Events"],
     }),
     updateEvent: builder.mutation({
-      query: (data) => ({
-        url: `${EVENT_URL}/primary/events/${data.id}`,
-        method: "PUT",
-        body: data,
+      query: ({ eventData }) => {
+        const {
+          startDate,
+          endDate,
+          startTime,
+          endTime,
+          timeZone,
+          allDay,
+          isMeeting,
+          attendees,
+          reqParams,
+          reminders,
+          summary,
+          description,
+          location,
+          visibility,
+          eventType,
+          colorId,
+          guestsCanModify,
+          guestsCanInviteOthers,
+          guestsCanSeeOtherGuests,
+          recurrence,
+          sequence,
+        } = eventData;
+
+        const createDateTimeObject = (date, time, isAllDay) => {
+          if (isAllDay) {
+            return { date };
+          }
+          return {
+            dateTime: new Date(`${date}T${time}:00`).toISOString(),
+            timeZone,
+          };
+        };
+
+        const body = {
+          summary,
+          description,
+          location,
+          start: createDateTimeObject(startDate, startTime, allDay),
+          end: createDateTimeObject(endDate, endTime, allDay),
+          visibility,
+          eventType,
+          // recurrence: [recurrence],
+          colorId,
+          guestsCanModify,
+          guestsCanInviteOthers,
+          guestsCanSeeOtherGuests,
+          sequence: sequence + 1,
+          attendees,
+          ...(isMeeting && {
+            conferenceData: {
+              createRequest: {
+                requestId: `meet-${Date.now()}`,
+                conferenceSolutionKey: { type: "hangoutsMeet" },
+              },
+            },
+          }),
+          reminders: {
+            ...reminders,
+            useDefault: !reminders?.overrides?.length,
+          },
+        };
+
+        const params = {
+          conferenceDataVersion: isMeeting ? 1 : 0,
+          maxAttendees: reqParams.maxAttendees,
+          sendNotifications: reqParams.sendNotifications,
+          sendUpdates: reqParams.sendUpdates,
+          supportsAttachments: reqParams.supportsAttachments,
+        };
+
+        return {
+          url: `${EVENT_URL}/${reqParams.calendarId}/events/${eventData.id}`,
+          method: "PUT",
+          params,
+          body,
+        };
+      },
+      invalidatesTags: ["Events"],
+    }),
+    deleteEvent: builder.mutation({
+      query: (eventId) => ({
+        url: `${EVENT_URL}/primary/events/${eventId}`,
+        method: "DELETE",
       }),
+      invalidatesTags: ["Events"],
     }),
   }),
 });
@@ -192,4 +274,5 @@ export const {
   useGetEventQuery,
   useCreateEventMutation,
   useUpdateEventMutation,
+  useDeleteEventMutation,
 } = eventApiSlice;

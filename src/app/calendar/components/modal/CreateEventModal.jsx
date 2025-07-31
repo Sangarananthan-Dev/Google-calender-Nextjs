@@ -53,18 +53,27 @@ const reminderMethods = [
   { value: "popup", label: "Notification" },
 ]
 
+const recurrenceOptions = [
+  { label: "Does not repeat", value: "" },
+  { label: "Daily", value: "RRULE:FREQ=DAILY" },
+  { label: "Every week (Monday to Friday)", value: "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR" },
+];
+
+
+
 const CreateEventModal = ({
   isOpen,
   isEditMode,
   eventId,
   onOpenChange,
   selectedRange,
-  setIsEditMode
+  setIsEditMode,
+  onEventCreated
 }) => {
   const { data: eventData } = useGetEventQuery(eventId, { skip: !isEditMode });
   console.log(eventData, "eventData");
-  const [createEvent] = useCreateEventMutation();
-  const [updateEvent] = useUpdateEventMutation();
+  const [createEvent, { isSuccess: isEventCreated }] = useCreateEventMutation();
+  const [updateEvent, { isSuccess: isEventUpdated }] = useUpdateEventMutation();
   const [newGuestEmail, setNewGuestEmail] = useState("");
   const [showColorPicker, setShowColorPicker] = useState(false);
   const formatDateTimeValues = (selectedRange) => {
@@ -136,7 +145,8 @@ const CreateEventModal = ({
     endDate,
     startTime,
     endTime,
-    timeZone,
+    timeZone: "UTC",
+    recurrence: "",
     allDay,
     isMeeting: false,
     description: "",
@@ -165,8 +175,12 @@ const CreateEventModal = ({
     try {
       if (!isEditMode) {
         await createEvent({ eventData }).unwrap();
+        onOpenChange(false)
+        onEventCreated?.()
       } else {
-        await updateEvent(values).unwrap();
+        await updateEvent({ eventData }).unwrap();
+        onOpenChange(false)
+        onEventCreated?.()
       }
     } catch (error) {
       console.log(error)
@@ -185,7 +199,7 @@ const CreateEventModal = ({
       onOpenChange(false)
       setIsEditMode({})
     }} className="border-0">
-      <DrawerContent className="h-[99%] bg-gray-50 p-0 m-0">
+      <DrawerContent className="h-[99%] bg-[#f8fcff] p-0 m-0">
         <Formik
           initialValues={eventData || initialData}
           validationSchema={validationSchema}
@@ -303,6 +317,19 @@ const CreateEventModal = ({
                               </option>
                             ))}
                           </Field>
+                          {/* <Field
+                            name="recurrence"
+                            as="select"
+                            className="custom-scrollbar min-w-[300px] outline-none text-sm custom-input"
+                          >
+                            {recurrenceOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </Field> */}
+
+
                         </div>
                       </div>
                     </div>
@@ -575,6 +602,25 @@ const CreateEventModal = ({
                           </Select>
                         )}
                       </Field>
+
+                    </div>
+                    <div className="flex p-1 gap-3 h-fit flex-shrink-0">
+                      {/* <Field name="guestsCanModify">
+                        {({ field }) => (
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              id="guestsCanModify"
+                              {...field}
+                              checked={field.value}
+                              className="w-4 h-4"
+                            />
+                            <label htmlFor="guestsCanModify" className="text-sm">
+                              Modify event
+                            </label>
+                          </div>
+                        )}
+                      </Field> */}
                       <Field name="reqParams.sendNotifications">
                         {({ field }) => (
                           <div className="flex items-center gap-2">
@@ -587,24 +633,6 @@ const CreateEventModal = ({
                             />
                             <label htmlFor="reqParams.sendNotifications" className="text-sm">
                               Send notifications
-                            </label>
-                          </div>
-                        )}
-                      </Field>
-                    </div>
-                    <div className="flex p-1 gap-3 h-fit flex-shrink-0">
-                      <Field name="guestsCanModify">
-                        {({ field }) => (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="guestsCanModify"
-                              {...field}
-                              checked={field.value}
-                              className="w-4 h-4"
-                            />
-                            <label htmlFor="guestsCanModify" className="text-sm">
-                              Modify event
                             </label>
                           </div>
                         )}

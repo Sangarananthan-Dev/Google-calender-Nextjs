@@ -150,7 +150,11 @@ export default function CalendarApp() {
         setSelectedEvent(null)
         setEventTriggerRect(null)
     }
-
+    const refetchCalendarEvents = () => {
+        if (calendarRef.current) {
+            calendarRef.current.getApi().refetchEvents()
+        }
+    }
     return (
         <div className="flex">
             <CalendarSideBar />
@@ -200,6 +204,7 @@ export default function CalendarApp() {
                 eventId={isEditMode.eventId}
                 key={isEditMode.eventId}
                 setIsEditMode={setIsEditMode}
+                onEventCreated={refetchCalendarEvents}
 
             />
 
@@ -210,6 +215,8 @@ export default function CalendarApp() {
                 triggerRect={eventTriggerRect}
                 setIsDrawerOpen={setIsDrawerOpen}
                 setIsEditMode={setIsEditMode}
+                onEventCreated={refetchCalendarEvents}
+
             />
         </div>
     )
