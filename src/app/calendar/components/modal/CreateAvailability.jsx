@@ -13,9 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
     X,
-    Plus,
     Clock,
-    Calendar,
     Trash,
     Calendar1Icon,
 } from "lucide-react"
@@ -24,21 +22,15 @@ import "@/styles/slotAvailability.css";
 const SlotAvailability = ({
     isOpen,
     isEditMode,
-    slotId,
     onOpenChange,
-    selectedRange,
 }) => {
     const calendarRef = useRef(null)
-    const [calendarView, setCalendarView] = useState('timeGridWeek')
-    const [newSlotDate, setNewSlotDate] = useState("")
 
-    // Helper function to get today's date in YYYY-MM-DD format
     const getTodayDate = () => {
         const today = new Date();
         return today.toISOString().split('T')[0];
     };
 
-    // Initial data structure
     const initialData = {
         "availability": [
             {
@@ -95,7 +87,6 @@ const SlotAvailability = ({
     }
 
 
-    // Enhanced validation schema with past date and duplicate date validation
     const validationSchema = Yup.object({
         availability: Yup.array()
             .of(
@@ -208,7 +199,6 @@ const SlotAvailability = ({
     const handleFormSubmit = async (values) => {
         console.log('Form submission:', values);
 
-        // Transform to the required JSON structure
         const transformedData = {
             slotGroups: [
                 {

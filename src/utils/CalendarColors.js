@@ -32,7 +32,7 @@
      foreground: "#1d1d1d",
    },
    9: {
-     background: "#039ae3",
+     background: "#3f51b5",
      foreground: "#1d1d1d",
    },
    10: {

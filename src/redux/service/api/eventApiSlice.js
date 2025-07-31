@@ -7,7 +7,7 @@ const eventApiSlice = apiService.injectEndpoints({
       query: ({ calendarId, timeMin, timeMax }) => ({
         url: `${EVENT_URL}/${calendarId}/events`,
         method: "GET",
-        params: { timeMin, timeMax },
+        params: { timeMin, timeMax, singleEvents: true },
       }),
       transformResponse: (response) => {
         return response.items.map((event) => ({
@@ -75,7 +75,7 @@ const eventApiSlice = apiService.injectEndpoints({
           endDate,
           startTime,
           endTime,
-          timeZone: response.start.timeZone || "Asia/Kolkata", 
+          timeZone: response.start.timeZone || "Asia/Kolkata",
           isMeeting: !!response.hangoutLink,
           visibility: response.visibility || "default",
           eventType: response.eventType || "default",
@@ -87,7 +87,7 @@ const eventApiSlice = apiService.injectEndpoints({
           sequence: response.sequence || 0,
           attendees: response.attendees || [],
           reqParams: {
-            calendarId: "primary", 
+            calendarId: "primary",
             conferenceDataVersion: response.hangoutLink ? 1 : 0,
             maxAttendees: 20,
             sendNotifications: true,
@@ -96,7 +96,6 @@ const eventApiSlice = apiService.injectEndpoints({
           },
         };
       },
-      
     }),
     createEvent: builder.mutation({
       query: ({ eventData }) => {
