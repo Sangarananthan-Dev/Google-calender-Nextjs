@@ -11,6 +11,9 @@ const scope = [
   "https://www.googleapis.com/auth/userinfo.email",
   "https://www.googleapis.com/auth/userinfo.profile",
   "https://www.googleapis.com/auth/calendar",
+  "https://www.googleapis.com/auth/meetings.space.create",
+  "https://www.googleapis.com/auth/meetings.space.readonly",
+  
 ];
 
 export const getAccessToken = async (code) => {
